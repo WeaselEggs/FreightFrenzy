@@ -16,9 +16,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 public class MecanumDriveOpMode extends LinearOpMode {
-    private static final int MIN_HEIGHT_TICKS = 900;
-    private static final double BALL_INTAKE_POSITION = 0.57;
-    private static final double CUBE_INTAKE_POSITION = 0.50;
+    private static final double BALL_INTAKE_POSITION = 0.50;
+    private static final double CUBE_INTAKE_POSITION = 0.625;
     private static final double DROPOFF_POSITION = 0.43;
     private static final double OBSTACLE_POSITION = 0.27;
 
@@ -34,18 +33,31 @@ public class MecanumDriveOpMode extends LinearOpMode {
         CRServo right_intake = hardwareMap.get(CRServo.class, "intake_right");
         left_intake.setDirection(DcMotorSimple.Direction.REVERSE);
         ServoImpl intake_pivot = hardwareMap.get(ServoImpl.class, "intake_pivot");
-       // DcMotor carousel_spin = hardwareMap.get(DcMotor.class, "carousel_spin");
+        DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
+        carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
+        DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
 
 
         waitForStart();
 
 
         while (!isStopRequested()){
-            // Mecanum Drive
+            // Felix special
+
             double rotated_x = -gamepad1.left_stick_y;
             double rotated_y = gamepad1.left_stick_x;
             double speed = -rotated_y;
             double strafe = rotated_x;
+
+
+            // Pranav special
+            /*
+            double rotated_x = gamepad1.left_stick_y;
+            double rotated_y = gamepad1.left_stick_x;
+            double speed = rotated_y;
+            double strafe = rotated_x;
+*/
+            // Mecanum Drive
             double rotate = -gamepad1.right_stick_x;
             double front_left_power = (speed+strafe+rotate);
             double front_right_power = (speed-strafe-rotate);
@@ -70,15 +82,21 @@ public class MecanumDriveOpMode extends LinearOpMode {
                 carousel_power = 0;
             }
 
-            //carousel_spin.setPower(carousel_power);
+            carousel_spin_blue.setPower(carousel_power);
+            carousel_spin_red.setPower(carousel_power);
 
             front_left.setPower(scale*front_left_power);
             front_right.setPower(scale*front_right_power);
             back_left.setPower(scale*back_left_power);
             back_right.setPower(scale*back_right_power);
 
-            left_intake.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
-            right_intake.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
+            double intake_power = gamepad2.right_trigger - gamepad2.left_trigger;
+
+            if (gamepad2.left_bumper) {
+                intake_power /= 3;
+            }
+            left_intake.setPower(intake_power);
+            right_intake.setPower(intake_power);
 
             if (gamepad2.dpad_down){
                 intake_pivot.setPosition(BALL_INTAKE_POSITION);
