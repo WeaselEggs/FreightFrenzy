@@ -15,8 +15,8 @@ public class AutoOpMode extends LinearOpMode {
     private DcMotor front_right;
     private DcMotor back_left;
     private DcMotor back_right;
-    private boolean is_blue;
-    private boolean is_red;
+    private boolean is_blue = false;
+    private boolean is_red = true;
     private boolean fancy_auto;
     private boolean wait_choice;
     private static final double BALL_INTAKE_POSITION = 0.50;
@@ -48,30 +48,38 @@ public class AutoOpMode extends LinearOpMode {
 
 
         // Go forward until the alliance shipping hub
-        drive(.55, 0, 0, 553);
+        drive(0, -.55, 0, 700);
         // Change intake position and out-take the cube
         intake_pivot.setPosition(DROPOFF_POSITION);
         waitfor(500);
-        left_intake.setPower(.5);
-        right_intake.setPower(.5);
+        left_intake.setPower(-.5);
+        right_intake.setPower(-.5);
         waitfor(500);
         intake_pivot.setPosition(OBSTACLE_POSITION);
         waitfor(500);
         // Strafe right until the border
-        drive(0, .55, 0, 1473);
+        drive(-.55, 0, 0, 1500);
         // Go back until the carousel
-        drive(-.55, 0, 0, 1000);
+        drive(0, .35, 0, 1300);
+        left_intake.setPower(0);
+        right_intake.setPower(0);
+        drive(0,.1,0, 600);
         // Spin the carousel
-        if (is_blue = true){
-            carousel_spin_blue.setPower(.55);
-        } else if (is_red = true) {
-            carousel_spin_red.setPower(.55);
+        if (is_blue == true){
+            carousel_spin_blue.setPower(.35);
+        } else if (is_red == true) {
+            carousel_spin_red.setPower(.35);
         }
-        waitfor(1000);
+        waitfor(2600);
         // Go forward to line up with the warehouse
-        drive(.55, 0, 0, 1000);
+        drive(0, -.55, 0, 600);
+        if (is_blue == true){
+            carousel_spin_blue.setPower(0);
+        } else if (is_red == true) {
+            carousel_spin_red.setPower(0);
+        }
         // Strafe left to get into the warehouse
-        drive(0, -.6, 0, 6000);
+        drive(.55, 0, 0, 4000);
     }
 
     private void choosewell() {
@@ -91,15 +99,20 @@ public class AutoOpMode extends LinearOpMode {
                 fancy_auto = false;
             }
 
-            telemetry.addData("fancy auto(a/b)", fancy_auto ? "yes" : "no");
-            telemetry.addData("Alliance Color Red(dpad left/dpad right)", is_red ? "yes" : "no");
-            telemetry.addData("Alliance Color Blue(dpad up/dpad down)", is_blue ? "yes" : "no");
+            telemetry.addData("Alliance Color Red(Nothing)", is_red ? "yes" : "no");
+            telemetry.addData("Alliance Color Blue(dpad right)", is_blue ? "yes" : "no");
             telemetry.addData("wait(x/y)", wait_choice ? "true" : "false");
             telemetry.update();
         }
     }
 
     private void drive(double speed, double strafe, double rotate, long milis){
+
+        if (is_blue == true) {
+            strafe = -strafe;
+            rotate = -rotate;
+        }
+
         double front_left_power = (speed+strafe+rotate);
         double front_right_power = (speed-strafe-rotate);
         double back_left_power = (speed-strafe+rotate);
