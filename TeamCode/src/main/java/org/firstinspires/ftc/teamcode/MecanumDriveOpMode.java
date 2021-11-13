@@ -37,26 +37,15 @@ public class MecanumDriveOpMode extends LinearOpMode {
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
 
-
         waitForStart();
 
-
         while (!isStopRequested()){
-            // Felix special
 
             double rotated_x = -gamepad1.left_stick_y;
             double rotated_y = gamepad1.left_stick_x;
             double speed = -rotated_y;
             double strafe = rotated_x;
 
-
-            // Pranav special
-            /*
-            double rotated_x = gamepad1.left_stick_y;
-            double rotated_y = gamepad1.left_stick_x;
-            double speed = rotated_y;
-            double strafe = rotated_x;
-*/
             // Mecanum Drive
             double rotate = -gamepad1.right_stick_x;
             double front_left_power = (speed+strafe+rotate);

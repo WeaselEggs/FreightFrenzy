@@ -17,8 +17,8 @@ public class AutoOpMode extends LinearOpMode {
     private DcMotor back_right;
     private boolean is_blue = false;
     private boolean is_red = true;
-    private boolean fancy_auto;
-    private boolean wait_choice;
+    private boolean wait_choice = false;
+    private boolean just_park = false;
     private static final double BALL_INTAKE_POSITION = 0.50;
     private static final double CUBE_INTAKE_POSITION = 0.625;
     private static final double DROPOFF_POSITION = 0.43;
@@ -46,41 +46,52 @@ public class AutoOpMode extends LinearOpMode {
 
         choosewell();
 
+        if (wait_choice == true) {
+            //Waits for 10 seconds
+            waitfor(10000);
+        }
 
-        // Go forward until the alliance shipping hub
-        drive(0, -.55, 0, 700);
-        // Change intake position and out-take the cube
-        intake_pivot.setPosition(DROPOFF_POSITION);
-        waitfor(500);
-        left_intake.setPower(-.5);
-        right_intake.setPower(-.5);
-        waitfor(500);
-        intake_pivot.setPosition(OBSTACLE_POSITION);
-        waitfor(500);
-        // Strafe right until the border
-        drive(-.55, 0, 0, 1500);
-        // Go back until the carousel
-        drive(0, .35, 0, 1300);
-        left_intake.setPower(0);
-        right_intake.setPower(0);
-        drive(0,.1,0, 600);
-        // Spin the carousel
-        if (is_blue == true){
-            carousel_spin_blue.setPower(.35);
-        } else if (is_red == true) {
-            carousel_spin_red.setPower(.35);
+        if (just_park == false) {
+            // Go forward until the alliance shipping hub
+            drive(0, -.55, 0, 750);
+            // Change intake position and out-take the cube
+            intake_pivot.setPosition(DROPOFF_POSITION);
+            waitfor(500);
+            left_intake.setPower(-.5);
+            right_intake.setPower(-.5);
+            waitfor(500);
+            intake_pivot.setPosition(OBSTACLE_POSITION);
+            waitfor(500);
+            // Strafe right until the perimeter
+            drive(-.55, 0, 0, 1500);
+            left_intake.setPower(0);
+            right_intake.setPower(0);
+            // Go "back" until the carousel (into the corner)
+            drive(0, .35, 0, 950);
+            drive(0, .1, 0, 600);
+            // Spin the carousel
+            if (is_blue == true) {
+                carousel_spin_blue.setPower(.35);
+            } else if (is_red == true) {
+                carousel_spin_red.setPower(.35);
+            }
+            waitfor(2800);
+            // Back out of the corner to line up with the warehouse
+            if (is_blue == true) {
+                carousel_spin_blue.setPower(0);
+            } else if (is_red == true) {
+                carousel_spin_red.setPower(0);
+            }
+            drive(0, -.55, 0, 600);
+            // Strafe left to get into the warehouse
+            drive(.55, 0, 0, 4000);
+        } else {
+            //Goes and parks into the warehouse
+            drive(0, -.55, 0, 500);
+            drive(.55, 0, 0, 2000);
         }
-        waitfor(2600);
-        // Go forward to line up with the warehouse
-        drive(0, -.55, 0, 600);
-        if (is_blue == true){
-            carousel_spin_blue.setPower(0);
-        } else if (is_red == true) {
-            carousel_spin_red.setPower(0);
-        }
-        // Strafe left to get into the warehouse
-        drive(.55, 0, 0, 4000);
     }
+
 
     private void choosewell() {
         while (!isStopRequested() && !isStarted()) {
@@ -93,24 +104,32 @@ public class AutoOpMode extends LinearOpMode {
                 is_blue = true;
             }
             if (gamepad1.a) {
-                fancy_auto = true;
+                wait_choice = true;
             }
-            if (gamepad1.b) {
-                fancy_auto = false;
+            if(gamepad1.b) {
+                wait_choice = false;
+            }
+            if(gamepad1.x) {
+                just_park = true;
+            }
+            if(gamepad1.y) {
+                just_park = false;
             }
 
-            telemetry.addData("Alliance Color Red(Nothing)", is_red ? "yes" : "no");
+
+            telemetry.addData("Just Park(x/y)", just_park ? "yes" : "no");
+            telemetry.addData("Alliance Color Red(dpad left)", is_red ? "yes" : "no");
             telemetry.addData("Alliance Color Blue(dpad right)", is_blue ? "yes" : "no");
-            telemetry.addData("wait(x/y)", wait_choice ? "true" : "false");
+            telemetry.addData("Wait(a/b)", wait_choice ? "yes" : "no");
             telemetry.update();
         }
     }
 
     private void drive(double speed, double strafe, double rotate, long milis){
 
-        if (is_blue == true) {
-            strafe = -strafe;
-            rotate = -rotate;
+        strafe = -strafe;
+        if (is_red == true) {
+            speed = -speed;
         }
 
         double front_left_power = (speed+strafe+rotate);
