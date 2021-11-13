@@ -19,6 +19,7 @@ public class AutoOpMode extends LinearOpMode {
     private boolean is_red = true;
     private boolean wait_choice = false;
     private boolean just_park = false;
+    private boolean skip_duck = false;
     private static final double BALL_INTAKE_POSITION = 0.50;
     private static final double CUBE_INTAKE_POSITION = 0.625;
     private static final double DROPOFF_POSITION = 0.43;
@@ -47,13 +48,34 @@ public class AutoOpMode extends LinearOpMode {
         choosewell();
 
         if (wait_choice == true) {
+
             //Waits for 10 seconds
             waitfor(10000);
         }
 
-        if (just_park == false) {
+        if (skip_duck == true) {
+
+            //Go forward until the alliance shipping hub
+            drive(0,-.55, 0, 750);
+
+            //Out-take the cube
+            intake_pivot.setPosition(DROPOFF_POSITION);
+            waitfor(500);
+            left_intake.setPower(-.5);
+            right_intake.setPower(-.5);
+            waitfor(500);
+            intake_pivot.setPosition(OBSTACLE_POSITION);
+            waitfor(500);
+
+            //Parks into the warehouse
+            drive(.55, 0, 0 , 2300);
+
+
+
+        } else if (just_park == false) {
             // Go forward until the alliance shipping hub
             drive(0, -.55, 0, 750);
+
             // Change intake position and out-take the cube
             intake_pivot.setPosition(DROPOFF_POSITION);
             waitfor(500);
@@ -62,13 +84,16 @@ public class AutoOpMode extends LinearOpMode {
             waitfor(500);
             intake_pivot.setPosition(OBSTACLE_POSITION);
             waitfor(500);
+
             // Strafe right until the perimeter
             drive(-.55, 0, 0, 1500);
             left_intake.setPower(0);
             right_intake.setPower(0);
+
             // Go "back" until the carousel (into the corner)
             drive(0, .35, 0, 950);
             drive(0, .1, 0, 600);
+
             // Spin the carousel
             if (is_blue == true) {
                 carousel_spin_blue.setPower(.35);
@@ -76,6 +101,7 @@ public class AutoOpMode extends LinearOpMode {
                 carousel_spin_red.setPower(.35);
             }
             waitfor(2800);
+
             // Back out of the corner to line up with the warehouse
             if (is_blue == true) {
                 carousel_spin_blue.setPower(0);
@@ -83,18 +109,21 @@ public class AutoOpMode extends LinearOpMode {
                 carousel_spin_red.setPower(0);
             }
             drive(0, -.55, 0, 600);
+
             // Strafe left to get into the warehouse
             drive(.55, 0, 0, 4000);
         } else {
+
             //Goes and parks into the warehouse
             drive(0, -.55, 0, 500);
-            drive(.55, 0, 0, 2000);
+            drive(.55, 0, 0, 2300);
         }
     }
 
 
     private void choosewell() {
         while (!isStopRequested() && !isStarted()) {
+
             if (gamepad1.dpad_left) {
                 is_blue = false;
                 is_red = true;
@@ -102,6 +131,12 @@ public class AutoOpMode extends LinearOpMode {
             if (gamepad1.dpad_right) {
                 is_red = false;
                 is_blue = true;
+            }
+            if(gamepad1.dpad_up) {
+              skip_duck = true;
+            }
+            if(gamepad1.dpad_down) {
+                skip_duck = false;
             }
             if (gamepad1.a) {
                 wait_choice = true;
@@ -117,10 +152,11 @@ public class AutoOpMode extends LinearOpMode {
             }
 
 
-            telemetry.addData("Just Park(x/y)", just_park ? "yes" : "no");
             telemetry.addData("Alliance Color Red(dpad left)", is_red ? "yes" : "no");
             telemetry.addData("Alliance Color Blue(dpad right)", is_blue ? "yes" : "no");
             telemetry.addData("Wait(a/b)", wait_choice ? "yes" : "no");
+            telemetry.addData("Just Park(x/y)", just_park ? "yes" : "no");
+            telemetry.addData("Skip duck(dpad up/dpad down)", skip_duck ? "yes" : "no");
             telemetry.update();
         }
     }
