@@ -37,6 +37,8 @@ public class MecanumDriveOpMode extends LinearOpMode {
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
 
+        intake_pivot.setPosition(CUBE_INTAKE_POSITION);
+
         waitForStart();
 
         while (!isStopRequested()){

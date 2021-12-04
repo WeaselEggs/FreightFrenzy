@@ -20,6 +20,7 @@ public class AutoOpMode extends LinearOpMode {
     private boolean wait_choice = false;
     private boolean just_park = false;
     private boolean skip_duck = false;
+    private boolean just_duck = false;
     private static final double BALL_INTAKE_POSITION = 0.50;
     private static final double CUBE_INTAKE_POSITION = 0.625;
     private static final double DROPOFF_POSITION = 0.43;
@@ -52,8 +53,34 @@ public class AutoOpMode extends LinearOpMode {
             //Waits for 10 seconds
             waitfor(10000);
         }
+        if (just_duck == true) {
 
-        if (skip_duck == true) {
+            //Move toward carousel
+            drive(0, -.55, 0, 400);
+            drive(-.55,0,0,400);
+            drive(0,.55,0,200);
+            drive(0, .1, 0, 600);
+
+
+            //Spin the carousel spinners
+            if (is_blue == true) {
+                carousel_spin_blue.setPower(.35);
+            } else if (is_red == true) {
+                carousel_spin_red.setPower(.35);
+            }
+            waitfor(3600);
+
+            if (is_blue == true) {
+                carousel_spin_blue.setPower(0);
+            } else if (is_red == true) {
+                carousel_spin_red.setPower(0);
+            }
+
+            //Parks in Depot
+            drive(0,-.55,0,550);
+
+
+        } else if (skip_duck == true) {
 
             //Go forward until the alliance shipping hub
             drive(0,-.55, 0, 750);
@@ -112,12 +139,15 @@ public class AutoOpMode extends LinearOpMode {
 
             // Strafe left to get into the warehouse
             drive(.55, 0, 0, 4000);
+
         } else {
 
             //Goes and parks into the warehouse
             drive(0, -.55, 0, 500);
             drive(.55, 0, 0, 2300);
         }
+
+        intake_pivot.setPosition(CUBE_INTAKE_POSITION);
     }
 
 
@@ -150,6 +180,12 @@ public class AutoOpMode extends LinearOpMode {
             if(gamepad1.y) {
                 just_park = false;
             }
+            if(gamepad1.right_bumper) {
+                just_duck = true;
+            }
+            if(gamepad1.left_bumper) {
+                just_duck = false;
+            }
 
 
             telemetry.addData("Alliance Color Red(dpad left)", is_red ? "yes" : "no");
@@ -157,6 +193,7 @@ public class AutoOpMode extends LinearOpMode {
             telemetry.addData("Wait(a/b)", wait_choice ? "yes" : "no");
             telemetry.addData("Just Park(x/y)", just_park ? "yes" : "no");
             telemetry.addData("Skip duck(dpad up/dpad down)", skip_duck ? "yes" : "no");
+            telemetry.addData("Just duck(right bumper/left bumper)", just_duck ? "yes" : "no");
             telemetry.update();
         }
     }
