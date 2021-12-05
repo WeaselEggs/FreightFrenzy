@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
-public class MecanumDriveOpMode extends LinearOpMode {
+public class SystemTest extends LinearOpMode {
     private static final double BALL_INTAKE_POSITION = 0.50;
     private static final double CUBE_INTAKE_POSITION = 0.625;
     private static final double DROPOFF_POSITION = 0.43;
@@ -27,11 +27,13 @@ public class MecanumDriveOpMode extends LinearOpMode {
         DcMotor front_right = hardwareMap.get(DcMotor.class, "front_right");
         DcMotor back_right = hardwareMap.get(DcMotor.class, "back_right");
         DcMotor back_left = hardwareMap.get(DcMotor.class, "back_left");
-        DcMotor slide_stage = hardwareMap.get(DcMotor.class, "slide");
         front_right.setDirection(DcMotorSimple.Direction.REVERSE);
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
         front_left.setDirection(DcMotorSimple.Direction.REVERSE);
         back_left.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
+
         DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
@@ -41,15 +43,20 @@ public class MecanumDriveOpMode extends LinearOpMode {
 
         waitForStart();
 
-        while (!isStopRequested()){
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            double speed = -gamepad1.left_stick_y;
-            double strafe = gamepad1.left_stick_x;
-            double rotate = gamepad1.right_stick_x;
+        while (!isStopRequested()){
+/*
+            double rotated_x = -gamepad1.left_stick_y;
+            double rotated_y = gamepad1.left_stick_x;
+            double speed = -rotated_y;
+            double strafe = rotated_x;
 
             // Mecanum Drive
-            double front_left_power = (speed+strafe+rotate);
-            double front_right_power = (speed-strafe-rotate);
+            double rotate = -gamepad1.right_stick_x;
+            double front_left_power = (speed-strafe-rotate);
+            double front_right_power = (speed+strafe+rotate);
             double back_left_power = (speed-strafe+rotate);
             double back_right_power = (speed+strafe-rotate);
             double max = Math.max(Math.max(Math.abs(front_left_power), Math.abs(front_right_power)),
@@ -62,7 +69,7 @@ public class MecanumDriveOpMode extends LinearOpMode {
             }
             if (gamepad1.left_bumper) {
                 scale /= 3;
-            }
+            }*/
 
             double carousel_power;
             if(gamepad2.right_bumper){
@@ -72,12 +79,12 @@ public class MecanumDriveOpMode extends LinearOpMode {
             }
 
             carousel_spin_blue.setPower(carousel_power);
-            carousel_spin_red.setPower(-carousel_power);
+            carousel_spin_red.setPower(carousel_power);
 
-            front_left.setPower(scale*front_left_power);
-            front_right.setPower(scale*front_right_power);
-            back_left.setPower(scale*back_left_power);
-            back_right.setPower(scale*back_right_power);
+            front_left.setPower(gamepad1.left_stick_x);
+            front_right.setPower(gamepad1.right_stick_x);
+            back_left.setPower(gamepad1.left_stick_y);
+            back_right.setPower(gamepad1.right_stick_y);
 
 
             //old intake system. delete once we dismantle pivot intake.
@@ -89,17 +96,14 @@ public class MecanumDriveOpMode extends LinearOpMode {
             }
             intake_spin.setPower(intake_power); */
 
-
-            boolean slide_pos1 = gamepad2.a;
-            boolean slide_pos2 = gamepad2.b;
-            boolean slide_pos3 = gamepad2.x;
-
-
+            double slide_power;
+            slide.setPower(gamepad2.right_stick_y);
+            int slide_ticks = slide.getCurrentPosition();
+            telemetry.addData("Slide Encoder:", String.format("%d", slide_ticks));
 
 
-
-
-           /* if (gamepad2.dpad_down){
+           /*
+           if (gamepad2.dpad_down){
                 intake_pivot.setPosition(BALL_INTAKE_POSITION);
             } else if (gamepad2.dpad_right){
                 intake_pivot.setPosition(CUBE_INTAKE_POSITION);
@@ -107,8 +111,15 @@ public class MecanumDriveOpMode extends LinearOpMode {
                 intake_pivot.setPosition(DROPOFF_POSITION);
             } else if (gamepad2.dpad_up){
                 intake_pivot.setPosition(OBSTACLE_POSITION);
+
            }
-*/
+           */
+
+
+
+
+            telemetry.update();
+
         }
     }
 }

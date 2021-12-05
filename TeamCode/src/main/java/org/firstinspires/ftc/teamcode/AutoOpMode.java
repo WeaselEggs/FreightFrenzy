@@ -36,6 +36,8 @@ public class AutoOpMode extends LinearOpMode {
         back_right = hardwareMap.get(DcMotor.class, "back_right");
         front_right.setDirection(DcMotorSimple.Direction.REVERSE);
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        front_left.setDirection(DcMotorSimple.Direction.REVERSE);
+        back_left.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
@@ -56,10 +58,10 @@ public class AutoOpMode extends LinearOpMode {
         if (just_duck == true) {
 
             //Move toward carousel
-            drive(0, -.55, 0, 400);
-            drive(-.55,0,0,400);
-            drive(0,.55,0,200);
-            drive(0, .1, 0, 600);
+            drive(-.55, 0, 0, 400);
+            drive(0,-.55,0,400);
+            drive(.55,0,0,200);
+            drive(.1, 0, 0, 600);
 
 
             //Spin the carousel spinners
@@ -77,13 +79,13 @@ public class AutoOpMode extends LinearOpMode {
             }
 
             //Parks in Depot
-            drive(0,-.55,0,550);
+            drive(-.55,0,0,550);
 
 
         } else if (skip_duck == true) {
 
             //Go forward until the alliance shipping hub
-            drive(0,-.55, 0, 750);
+            drive(-.55,0, 0, 750);
 
             //Out-take the cube
             intake_pivot.setPosition(DROPOFF_POSITION);
@@ -95,13 +97,13 @@ public class AutoOpMode extends LinearOpMode {
             waitfor(500);
 
             //Parks into the warehouse
-            drive(.55, 0, 0 , 2300);
+            drive(0, -.55, 0 , 2300);
 
 
 
         } else if (just_park == false) {
             // Go forward until the alliance shipping hub
-            drive(0, -.55, 0, 750);
+            drive(-.55, 0, 0, 750);
 
             // Change intake position and out-take the cube
             intake_pivot.setPosition(DROPOFF_POSITION);
@@ -118,8 +120,8 @@ public class AutoOpMode extends LinearOpMode {
             right_intake.setPower(0);
 
             // Go "back" until the carousel (into the corner)
-            drive(0, .35, 0, 950);
-            drive(0, .1, 0, 600);
+            drive(.35, 0, 0, 950);
+            drive(.1, 0, 0, 600);
 
             // Spin the carousel
             if (is_blue == true) {
@@ -135,16 +137,16 @@ public class AutoOpMode extends LinearOpMode {
             } else if (is_red == true) {
                 carousel_spin_red.setPower(0);
             }
-            drive(0, -.55, 0, 600);
+            drive(-.55, 0, 0, 600);
 
             // Strafe left to get into the warehouse
-            drive(.55, 0, 0, 4000);
+            drive(0, .55, 0, 4000);
 
         } else {
 
             //Goes and parks into the warehouse
-            drive(0, -.55, 0, 500);
-            drive(.55, 0, 0, 2300);
+            drive(-.55, 0, 0, 500);
+            drive(0, .55, 0, 2300);
         }
 
         intake_pivot.setPosition(CUBE_INTAKE_POSITION);
@@ -200,9 +202,8 @@ public class AutoOpMode extends LinearOpMode {
 
     private void drive(double speed, double strafe, double rotate, long milis){
 
-        strafe = -strafe;
         if (is_red == true) {
-            speed = -speed;
+            strafe = -strafe;
         }
 
         double front_left_power = (speed+strafe+rotate);
