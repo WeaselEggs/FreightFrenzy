@@ -92,10 +92,6 @@ public class AutoOpMode extends LinearOpMode {
 
         } else if (skip_duck == true) {
 
-            //Go forward and strafe right until the alliance shipping hub
-            drive(.55,0, 0, 750);
-            drive(0,.55,0,750);
-
             //Slide kit to stage 3
             slide.setTargetPosition(1364);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -103,8 +99,11 @@ public class AutoOpMode extends LinearOpMode {
             slide.setPower(0.35);
             slide_stable = true;
 
-            //Strafe right toward the alliance shipping hub
-            drive(0,.55,0,2250);
+            waitfor(1000);
+
+            //Go forward until the alliance shipping hub
+            drive(.55,0, 0, 750);
+
 
             //Out-take the cube
             drive(.1,0,0,100);
@@ -125,12 +124,16 @@ public class AutoOpMode extends LinearOpMode {
             slide_stable = true;
 
             //Strafe and rotate
-            drive(0,-.55,0,300);
-            drive(0,0,-.5,750);
+            drive(-.55,0,0,200);
+            if (is_red == true) {
+                drive(0,0,.5,750);
+            } else if (is_blue == true) {
+                drive(0,0,-.5,750);
+            }
 
 
             //Strafe right and parks in the warehouse
-            drive(.55, 0, 0 , 3000);
+            drive(.55, 0, 0 , 3700);
 
             //Slide kit to bottom
             slide.setTargetPosition(0);
@@ -192,9 +195,10 @@ public class AutoOpMode extends LinearOpMode {
 
             //Strafe and rotate
             drive(-.55,0,0,200);
-            drive(0,0,-.5,750);
             if (is_red == true) {
                 drive(0,0,.5,750);
+            } else if (is_blue == true) {
+                drive(0,0,-.5,750);
             }
 
             //Slide kit to stage 1
