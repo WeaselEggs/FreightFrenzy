@@ -164,7 +164,7 @@ public class AutoOpMode extends LinearOpMode {
             }
 
             //Go forward until the alliance shipping hub
-            drive(.55,0, 0, 600);
+            drive(.55,0, 0, 300);
 
             //Slide kit to stage 3
             slide.setTargetPosition(1364);
@@ -173,8 +173,10 @@ public class AutoOpMode extends LinearOpMode {
             slide.setPower(0.35);
             slide_stable = true;
 
-            //Strafe right toward the alliance shipping hub
+            //Strafe right and forward toward the alliance shipping hub
             drive(0,.55,0,2150);
+            drive(.55,0, 0, 300);
+
 
             //Out-take the cube
             drive(.1,0,0,100);
