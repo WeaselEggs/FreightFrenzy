@@ -32,23 +32,31 @@ public class AutoOpMode extends LinearOpMode {
 
         front_left = hardwareMap.get(DcMotor.class, "front_left");
         front_right = hardwareMap.get(DcMotor.class, "front_right");
-        back_left = hardwareMap.get(DcMotor.class, "back_left");
         back_right = hardwareMap.get(DcMotor.class, "back_right");
+        back_left = hardwareMap.get(DcMotor.class, "back_left");
         front_right.setDirection(DcMotorSimple.Direction.REVERSE);
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
         front_left.setDirection(DcMotorSimple.Direction.REVERSE);
         back_left.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
+
         DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
-        CRServo left_intake = hardwareMap.get(CRServo.class, "intake_left");
-        CRServo right_intake = hardwareMap.get(CRServo.class, "intake_right");
-        left_intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        ServoImpl intake_pivot = hardwareMap.get(ServoImpl.class, "intake_pivot");
 
-        intake_pivot.setPosition(OBSTACLE_POSITION);
+        CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
+        CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
 
         choosewell();
+
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ElapsedTime slide_timer = new ElapsedTime();
+        boolean slide_stable = true;
+        double slide_power;
+        int slide_ticks = slide.getCurrentPosition();
 
         if (wait_choice == true) {
 
@@ -57,20 +65,19 @@ public class AutoOpMode extends LinearOpMode {
         }
         if (just_duck == true) {
 
-            //Move toward carousel
-            drive(-.55, 0, 0, 400);
-            drive(0,-.55,0,400);
-            drive(.55,0,0,200);
-            drive(.1, 0, 0, 600);
-
+            //Strafe left toward carousel
+            drive(.55,0,0,500);
+            drive(0, -.55, 0, 500);
+            drive(-.45,0,0,300);
+            drive(-.1, 0, 0, 600);
 
             //Spin the carousel spinners
             if (is_blue == true) {
-                carousel_spin_blue.setPower(.35);
+                carousel_spin_blue.setPower(-.35);
             } else if (is_red == true) {
                 carousel_spin_red.setPower(.35);
             }
-            waitfor(3600);
+            waitfor(3850);
 
             if (is_blue == true) {
                 carousel_spin_blue.setPower(0);
@@ -79,77 +86,166 @@ public class AutoOpMode extends LinearOpMode {
             }
 
             //Parks in Depot
-            drive(-.55,0,0,550);
+            drive(.55,0,0,550);
+            drive(0,-.55,0,150);
 
 
         } else if (skip_duck == true) {
 
-            //Go forward until the alliance shipping hub
-            drive(-.55,0, 0, 750);
+            //Go forward and strafe right until the alliance shipping hub
+            drive(.55,0, 0, 750);
+            drive(0,.55,0,750);
+
+            //Slide kit to stage 3
+            slide.setTargetPosition(1364);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.35);
+            slide_stable = true;
+
+            //Strafe right toward the alliance shipping hub
+            drive(0,.55,0,2250);
 
             //Out-take the cube
-            intake_pivot.setPosition(DROPOFF_POSITION);
-            waitfor(500);
-            left_intake.setPower(-.5);
-            right_intake.setPower(-.5);
-            waitfor(500);
-            intake_pivot.setPosition(OBSTACLE_POSITION);
-            waitfor(500);
+            drive(.1,0,0,100);
+            waitfor(100);
+            intake_left.setPower(.5);
+            intake_right.setPower(-.5);
+            waitfor(800);
 
-            //Parks into the warehouse
-            drive(0, -.55, 0 , 2300);
+            //Stop out-take
+            intake_left.setPower(0);
+            intake_right.setPower(0);
 
+            //Slide kit to stage 1
+            slide.setTargetPosition(380);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.35);
+            slide_stable = true;
+
+            //Strafe and rotate
+            drive(0,-.55,0,300);
+            drive(0,0,-.5,750);
+
+
+            //Strafe right and parks in the warehouse
+            drive(.55, 0, 0 , 3000);
+
+            //Slide kit to bottom
+            slide.setTargetPosition(0);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.45);
+            slide_stable = true;
+
+            waitfor(2000);
 
 
         } else if (just_park == false) {
-            // Go forward until the alliance shipping hub
-            drive(-.55, 0, 0, 750);
+            //Strafe left toward carousel
+            drive(.55,0,0,500);
+            drive(0, -.55, 0, 500);
+            drive(-.45,0,0,300);
+            drive(-.1, 0, 0, 600);
 
-            // Change intake position and out-take the cube
-            intake_pivot.setPosition(DROPOFF_POSITION);
-            waitfor(500);
-            left_intake.setPower(-.5);
-            right_intake.setPower(-.5);
-            waitfor(500);
-            intake_pivot.setPosition(OBSTACLE_POSITION);
-            waitfor(500);
-
-            // Strafe right until the perimeter
-            drive(-.55, 0, 0, 1500);
-            left_intake.setPower(0);
-            right_intake.setPower(0);
-
-            // Go "back" until the carousel (into the corner)
-            drive(.35, 0, 0, 950);
-            drive(.1, 0, 0, 600);
-
-            // Spin the carousel
+            //Spin the carousel spinners
             if (is_blue == true) {
-                carousel_spin_blue.setPower(.35);
+                carousel_spin_blue.setPower(-.35);
             } else if (is_red == true) {
                 carousel_spin_red.setPower(.35);
             }
-            waitfor(2800);
+            waitfor(4000);
 
-            // Back out of the corner to line up with the warehouse
             if (is_blue == true) {
                 carousel_spin_blue.setPower(0);
             } else if (is_red == true) {
                 carousel_spin_red.setPower(0);
             }
-            drive(-.55, 0, 0, 600);
 
-            // Strafe left to get into the warehouse
-            drive(0, .55, 0, 4000);
+            //Go forward until the alliance shipping hub
+            drive(.55,0, 0, 600);
+
+            //Slide kit to stage 3
+            slide.setTargetPosition(1364);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.35);
+            slide_stable = true;
+
+            //Strafe right toward the alliance shipping hub
+            drive(0,.55,0,2150);
+
+            //Out-take the cube
+            drive(.1,0,0,100);
+            waitfor(100);
+            intake_left.setPower(.5);
+            intake_right.setPower(-.5);
+            waitfor(800);
+
+            //Stop out-take
+            intake_left.setPower(0);
+            intake_right.setPower(0);
+
+
+            //Strafe and rotate
+            drive(-.55,0,0,200);
+            drive(0,0,-.5,750);
+            if (is_red == true) {
+                drive(0,0,.5,750);
+            }
+
+            //Slide kit to stage 1
+            slide.setTargetPosition(380);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.35);
+            slide_stable = true;
+
+
+            //Strafe right and parks in the warehouse
+            drive(.55, 0, 0 , 3700);
+
+            //Slide kit to bottom
+            slide.setTargetPosition(0);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.45);
+            slide_stable = true;
+
+            waitfor(2000);
+          
 
         } else {
 
             //Goes and parks into the warehouse
-            drive(-.55, 0, 0, 500);
-            drive(0, .55, 0, 2300);
+            drive(.55,0, 0, 600);
+            drive(.55, 0, 0 , 3700);
         }
 
-        intake_pivot.setPosition(CUBE_INTAKE_POSITION);
+        slide_power = -gamepad2.right_stick_y / 1.75;
+        slide_power = Math.signum(slide_power) * Math.pow(Math.abs(slide_power), 1.5);
+
+        if (Math.abs(slide_power) < 0.05) {
+            if (!slide_stable) {
+                if (slide_timer.milliseconds() < 200) {
+                    slide.setPower(0.05);
+                } else {
+                    slide.setTargetPosition(slide.getCurrentPosition());
+                    slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    slide.setPower(0.35);
+                    slide_stable = true;
+                }
+            }
+        } else {
+            if (slide_stable) {
+                slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                slide_stable = false;
+            }
+            slide_timer.reset();
+            slide.setPower(slide_power);
+        }
     }
 
 
@@ -200,9 +296,10 @@ public class AutoOpMode extends LinearOpMode {
         }
     }
 
+
     private void drive(double speed, double strafe, double rotate, long milis){
 
-        if (is_red == true) {
+        if (is_blue == true) {
             strafe = -strafe;
         }
 

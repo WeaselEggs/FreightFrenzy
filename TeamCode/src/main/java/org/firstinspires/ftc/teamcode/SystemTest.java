@@ -45,6 +45,7 @@ public class SystemTest extends LinearOpMode {
 
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         while (!isStopRequested()){
 /*
@@ -97,8 +98,22 @@ public class SystemTest extends LinearOpMode {
             intake_spin.setPower(intake_power); */
 
             double slide_power;
-            slide.setPower(gamepad2.right_stick_y);
+            slide.setPower(-gamepad2.right_stick_y);
             int slide_ticks = slide.getCurrentPosition();
+
+            if (gamepad2.a) {
+                slide.setTargetPosition(1380);
+                slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+
+            if (gamepad2.x) {
+                slide.setTargetPosition(870);
+            }
+
+            if (gamepad1.b) {
+                slide.setTargetPosition(350);
+            }
+
             telemetry.addData("Slide Encoder:", String.format("%d", slide_ticks));
 
 
