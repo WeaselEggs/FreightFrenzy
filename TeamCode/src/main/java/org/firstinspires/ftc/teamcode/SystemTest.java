@@ -34,9 +34,9 @@ public class SystemTest extends LinearOpMode {
 
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
-        DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
-        carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
-        DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
+        CRServo carousel_spin_blue = hardwareMap.get(CRServo.class, "carousel_spin_blue");
+
+        CRServo carousel_spin_red = hardwareMap.get(CRServo.class, "carousel_spin_red");
 
         //CRServo intake_spin = hardwareMap.get(CRServo.class, "intake_spin");
         //intake_pivot.setPosition(CUBE_INTAKE_POSITION);

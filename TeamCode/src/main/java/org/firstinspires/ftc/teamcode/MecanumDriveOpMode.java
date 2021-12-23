@@ -34,9 +34,9 @@ public class MecanumDriveOpMode extends LinearOpMode {
 
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
-        DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
+        CRServo carousel_spin_blue = hardwareMap.get(CRServo.class, "carousel_spin_blue");
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
-        DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
+        CRServo carousel_spin_red = hardwareMap.get(CRServo.class, "carousel_spin_red");
 
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
@@ -47,8 +47,8 @@ public class MecanumDriveOpMode extends LinearOpMode {
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        carousel_spin_blue.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        carousel_spin_red.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //carousel_spin_blue.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //carousel_spin_red.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         ElapsedTime slide_timer = new ElapsedTime();
         boolean slide_stable = true;
@@ -78,7 +78,7 @@ public class MecanumDriveOpMode extends LinearOpMode {
 
             double carousel_power;
             if (gamepad2.dpad_down) {
-                carousel_power = 0.6;
+                carousel_power = 1;
             } else {
                 carousel_power = 0;
             }

@@ -41,9 +41,9 @@ public class AutoOpMode extends LinearOpMode {
 
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
-        DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
+        CRServo carousel_spin_blue = hardwareMap.get(CRServo.class, "carousel_spin_blue");
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
-        DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
+        CRServo carousel_spin_red = hardwareMap.get(CRServo.class, "carousel_spin_red");
 
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
@@ -73,9 +73,9 @@ public class AutoOpMode extends LinearOpMode {
 
             //Spin the carousel spinners
             if (is_blue == true) {
-                carousel_spin_blue.setPower(-.35);
+                carousel_spin_blue.setPower(-1);
             } else if (is_red == true) {
-                carousel_spin_red.setPower(.35);
+                carousel_spin_red.setPower(1);
             }
             waitfor(3850);
 
@@ -102,7 +102,8 @@ public class AutoOpMode extends LinearOpMode {
             waitfor(1000);
 
             //Go forward until the alliance shipping hub
-            drive(.55,0, 0, 750);
+            drive(.55,0, 0, 300);
+            drive(.25,0,0,950);
 
 
             //Out-take the cube
@@ -133,10 +134,12 @@ public class AutoOpMode extends LinearOpMode {
 
 
             //Strafe right and parks in the warehouse
-            drive(.55, 0, 0 , 3700);
+            drive(.55, 0, 0 , 2000);
+            drive(0,-.55,0,200);
+            drive(.55,0,0,1700);
 
-            //Slide kit to bottom
-            slide.setTargetPosition(0);
+            //Slide kit to stage 2
+            slide.setTargetPosition(803);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             slide.setPower(0.45);
@@ -167,7 +170,7 @@ public class AutoOpMode extends LinearOpMode {
             }
 
             //Go forward until the alliance shipping hub
-            drive(.55,0, 0, 300);
+            drive(.25,0, 0, 950);
 
             //Slide kit to stage 3
             slide.setTargetPosition(1364);
@@ -210,10 +213,12 @@ public class AutoOpMode extends LinearOpMode {
 
 
             //Strafe right and parks in the warehouse
-            drive(.55, 0, 0 , 3700);
+            drive(.55, 0, 0 , 2000);
+            drive(0,-.55,0,200);
+            drive(.55,0,0,1700);
 
-            //Slide kit to bottom
-            slide.setTargetPosition(0);
+            //Slide kit to stage 2
+            slide.setTargetPosition(803);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             slide.setPower(0.45);
