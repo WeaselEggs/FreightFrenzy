@@ -87,7 +87,7 @@ public class WeebcamConcept2 extends LinearOpMode {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            " AZUrz3f/////AAABmZK46gXg70VkukWw2BSgeVFFFEAFEh1sZ5GivRnIwLqo43STn9oof4MHjlTdaThiJxKU8nTigtI7AeEJUcEF8Pe3s0HnVvPlehgV+tKCVK3p6GfCZlhtuFQ0q8uQnDlxk+atKB6OhMlsRWX0Odd/HN74rI+9W8yNyAemWzhN4ltUUrAwoRJiTHoeSNRKzsOH1QXB/PW4apXfxvhh9VnYiVqzKOU+tL21p1sHFkZ+wae5bXAdNwKGu4NSjg6Iaben5+uNzdFg1o/SteS6QK2ePrqTrBvwkV9Z+Fz3028UEnwazINOrFeHlnVbUXW9Tntp8W1dZWeFVwVw5B4LTNoftl8zse/ygxYk5PHRQc7RMw1M";
+            "AZUrz3f/////AAABmZK46gXg70VkukWw2BSgeVFFFEAFEh1sZ5GivRnIwLqo43STn9oof4MHjlTdaThiJxKU8nTigtI7AeEJUcEF8Pe3s0HnVvPlehgV+tKCVK3p6GfCZlhtuFQ0q8uQnDlxk+atKB6OhMlsRWX0Odd/HN74rI+9W8yNyAemWzhN4ltUUrAwoRJiTHoeSNRKzsOH1QXB/PW4apXfxvhh9VnYiVqzKOU+tL21p1sHFkZ+wae5bXAdNwKGu4NSjg6Iaben5+uNzdFg1o/SteS6QK2ePrqTrBvwkV9Z+Fz3028UEnwazINOrFeHlnVbUXW9Tntp8W1dZWeFVwVw5B4LTNoftl8zse/ygxYk5PHRQc7RMw1M";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
