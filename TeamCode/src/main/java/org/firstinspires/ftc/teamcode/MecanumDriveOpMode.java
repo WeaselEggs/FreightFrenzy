@@ -35,8 +35,8 @@ public class MecanumDriveOpMode extends LinearOpMode {
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
         CRServo carousel_spin_blue = hardwareMap.get(CRServo.class, "carousel_spin_blue");
-        carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
         CRServo carousel_spin_red = hardwareMap.get(CRServo.class, "carousel_spin_red");
+        carousel_spin_red.setDirection(DcMotorSimple.Direction.REVERSE);
 
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
