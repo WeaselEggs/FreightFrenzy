@@ -81,11 +81,18 @@ public class ConceptWebcam extends LinearOpMode {
 
     private static final String TAG = "Webcam Sample";
 
-    private static final int LEFT_X = 10;
-    private static final int LEFT_W = 40;
-    private static final int LEFT_Y = 200;
-    private static final int LEFT_H = 20;
-
+    private static final int LEFT_X = 3;
+    private static final int LEFT_W = 89;
+    private static final int LEFT_Y = 230;
+    private static final int LEFT_H = 140;
+    private static final int RIGHT_X = 573;
+    private static final int RIGHT_W = 66;
+    private static final int RIGHT_Y = 243;
+    private static final int RIGHT_H = 143;
+    private static final int MID_X = 255;
+    private static final int MID_W = 104;
+    private static final int MID_Y = 236;
+    private static final int MID_H = 142;
     //----------------------------------------------------------------------------------------------
     // State
     //----------------------------------------------------------------------------------------------
@@ -163,21 +170,44 @@ public class ConceptWebcam extends LinearOpMode {
 
     /** Do something with the frame */
     private void onNewFrame(Bitmap bitmap) {
-        saveBitmap(bitmap);
 
-        //int leftAverageColor = MeasureRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
-        // TODO: telemetry.addData()
+
+        int leftAverageColor = MeasureRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
+        telemetry.addData("Left average:", String.format("%06X", leftAverageColor));
+        int midAverageColor = MeasureRectangle(bitmap, MID_X, MID_W, MID_Y, MID_H);
+        telemetry.addData("MID AVERAGE:", String.format("%06X", midAverageColor));
+        int rightAverageColor = MeasureRectangle(bitmap, RIGHT_X, RIGHT_W, RIGHT_Y, RIGHT_H);
+        telemetry.addData("RIGHT AVERAGE:", String.format("%06X", rightAverageColor));
+        int leftLeft= ComputeYellowness(leftAverageColor);
+        int midMid= ComputeYellowness(midAverageColor);
+        int rightRight= ComputeYellowness(rightAverageColor);
+        telemetry.addData("left:", String.format("%06X", leftLeft));
+        telemetry.addData("mid:", String.format("%06X", midMid));
+        telemetry.addData("right:", String.format("%06X", rightRight));
+        telemetry.update();
+
 
         DrawRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
+        DrawRectangle(bitmap, RIGHT_X, RIGHT_W, RIGHT_Y, RIGHT_H);
+        DrawRectangle(bitmap, MID_X, MID_W, MID_Y, MID_H);
         cameraStreamRequestContinuation.dispatch(new ContinuationResult<Consumer<Bitmap>>() {
             @Override
             public void handle(Consumer<Bitmap> consumer) {
                 consumer.accept(bitmap);
             }
         });
-
+        saveBitmap(bitmap);
         //bitmap.recycle(); // not strictly necessary, but helpful
     }
+    private int ComputeYellowness (int color){
+        int red = (color & 0x00FF0000) >> 16;
+        int green = (color & 0x0000FF00) >> 8;
+        int blue = (color & 0x000000FF);
+        return red+green-blue;
+
+
+    }
+
 
     private void DrawRectangle(Bitmap bitmap, int x, int w, int y, int h) {
         DrawHLine(bitmap, x, y - 1, w);
@@ -203,8 +233,8 @@ public class ConceptWebcam extends LinearOpMode {
         int totalGreen = 0;
         int totalBlue = 0;
 
-        for(int runningX = x; runningX < x+w; x++){
-            for(int runningY = y; runningY < y+h; y++){
+        for(int runningX = x; runningX < x+w; runningX++){
+            for(int runningY = y; runningY < y+h; runningY++){
                 int pixel = bitmap.getPixel(runningX, runningY);
                 int red = (pixel & 0x00FF0000) >> 16;
                 int green = (pixel & 0x0000FF00) >> 8;
