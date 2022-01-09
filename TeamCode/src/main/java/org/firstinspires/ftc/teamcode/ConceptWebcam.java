@@ -44,6 +44,7 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.android.util.Size;
 import org.firstinspires.ftc.robotcore.external.function.Consumer;
 import org.firstinspires.ftc.robotcore.external.function.Continuation;
+import org.firstinspires.ftc.robotcore.external.function.ContinuationResult;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureRequest;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSequenceId;
@@ -53,6 +54,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraException;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraFrame;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraManager;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamServer;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.internal.collections.EvictingBlockingQueue;
 import org.firstinspires.ftc.robotcore.internal.network.CallbackLooper;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
@@ -74,14 +77,18 @@ import java.util.concurrent.TimeUnit;
  * using Media Transfer; ADB; etc)
  */
 @TeleOp(name="Concept: Webcam", group ="Concept")
-@Disabled
 public class ConceptWebcam extends LinearOpMode {
+
+    private static final String TAG = "Webcam Sample";
+
+    private static final int LEFT_X = 10;
+    private static final int LEFT_W = 40;
+    private static final int LEFT_Y = 200;
+    private static final int LEFT_H = 20;
 
     //----------------------------------------------------------------------------------------------
     // State
     //----------------------------------------------------------------------------------------------
-
-    private static final String TAG = "Webcam Sample";
 
     /** How long we are to wait to be granted permission to use the camera before giving up. Here,
      * we wait indefinitely */
@@ -106,6 +113,9 @@ public class ConceptWebcam extends LinearOpMode {
      * if you're curious): no knowledge of multi-threading is needed here. */
     private Handler callbackHandler;
 
+    private boolean captureWhenAvailable = false;
+    private Continuation<? extends Consumer<Bitmap>> cameraStreamRequestContinuation;
+
     //----------------------------------------------------------------------------------------------
     // Main OpMode entry
     //----------------------------------------------------------------------------------------------
@@ -120,6 +130,14 @@ public class ConceptWebcam extends LinearOpMode {
         initializeFrameQueue(2);
         AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
 
+        CameraStreamServer.getInstance().setSource(new CameraStreamSource() {
+            @Override
+            public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+                cameraStreamRequestContinuation = continuation;
+                captureWhenAvailable = true;
+            }
+        });
+
         try {
             openCamera();
             if (camera == null) return;
@@ -127,22 +145,8 @@ public class ConceptWebcam extends LinearOpMode {
             startCamera();
             if (cameraCaptureSession == null) return;
 
-            telemetry.addData(">", "Press Play to start");
-            telemetry.update();
-            waitForStart();
-            telemetry.clear();
-            telemetry.addData(">", "Started...Press 'A' to capture frame");
-
-            boolean buttonPressSeen = false;
-            boolean captureWhenAvailable = false;
-            while (opModeIsActive()) {
-
-                boolean buttonIsPressed = gamepad1.a;
-                if (buttonIsPressed && !buttonPressSeen) {
-                    captureWhenAvailable = true;
-                }
-                buttonPressSeen = buttonIsPressed;
-
+            while (!isStarted() && !isStopRequested())
+            {
                 if (captureWhenAvailable) {
                     Bitmap bmp = frameQueue.poll();
                     if (bmp != null) {
@@ -150,8 +154,7 @@ public class ConceptWebcam extends LinearOpMode {
                         onNewFrame(bmp);
                     }
                 }
-
-                telemetry.update();
+                idle();
             }
         } finally {
             closeCamera();
@@ -159,13 +162,43 @@ public class ConceptWebcam extends LinearOpMode {
     }
 
     /** Do something with the frame */
-    private void onNewFrame(Bitmap frame) {
-        saveBitmap(frame);
-        frame.recycle(); // not strictly necessary, but helpful
+    private void onNewFrame(Bitmap bitmap) {
+        saveBitmap(bitmap);
+
+        //int leftAverageColor = MeasureRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
+        // TODO: telemetry.addData()
+
+        DrawRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
+        cameraStreamRequestContinuation.dispatch(new ContinuationResult<Consumer<Bitmap>>() {
+            @Override
+            public void handle(Consumer<Bitmap> consumer) {
+                consumer.accept(bitmap);
+            }
+        });
+
+        //bitmap.recycle(); // not strictly necessary, but helpful
     }
 
-    private int MearsureRectangle(Bitmap bitmap, int x, int w, int y, int h){
+    private void DrawRectangle(Bitmap bitmap, int x, int w, int y, int h) {
+        DrawHLine(bitmap, x, y - 1, w);
+        DrawHLine(bitmap, x, y + h, w);
+        DrawVLine(bitmap, x - 1, y - 1, h + 2);
+        DrawVLine(bitmap, x + w, y - 1, h + 2);
+    }
 
+    private void DrawHLine(Bitmap bitmap, int x0, int y, int w) {
+        for (int x = x0; x < x0 + w; x++) {
+            bitmap.setPixel(x, y, 0xFFAF00AF);
+        }
+    }
+
+    private void DrawVLine(Bitmap bitmap, int x, int y0, int h) {
+        for (int y = y0; y < y0 + h; y++) {
+            bitmap.setPixel(x, y, 0xFFAF00AF);
+        }
+    }
+
+    private int MeasureRectangle(Bitmap bitmap, int x, int w, int y, int h) {
         int totalRed = 0;
         int totalGreen = 0;
         int totalBlue = 0;
