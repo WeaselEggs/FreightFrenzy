@@ -41,9 +41,9 @@ public class AutoOpMode extends LinearOpMode {
 
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
-        CRServo carousel_spin_blue = hardwareMap.get(CRServo.class, "carousel_spin_blue");
+        DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
-        CRServo carousel_spin_red = hardwareMap.get(CRServo.class, "carousel_spin_red");
+        DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
 
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
@@ -73,9 +73,9 @@ public class AutoOpMode extends LinearOpMode {
 
             //Spin the carousel spinners
             if (is_blue == true) {
-                carousel_spin_blue.setPower(-1);
+                carousel_spin_blue.setPower(-.35);
             } else if (is_red == true) {
-                carousel_spin_red.setPower(1);
+                carousel_spin_red.setPower(.35);
             }
             waitfor(3850);
 
