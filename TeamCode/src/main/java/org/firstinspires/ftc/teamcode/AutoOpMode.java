@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -63,7 +64,7 @@ public class AutoOpMode extends LinearOpMode {
     private static final double DROPOFF_POSITION = 0.43;
     private static final double OBSTACLE_POSITION = 0.27;
     private static final String TAG = "Webcam Sample";
-
+    private static final double CAPPER_STORED_POSITION = .8;
 
     private static final int LEFT_X = 3;
     private static final int LEFT_W = 89;
@@ -104,7 +105,7 @@ public class AutoOpMode extends LinearOpMode {
      * if you're curious): no knowledge of multi-threading is needed here. */
     private Handler callbackHandler;
 
-    private boolean captureWhenAvailable = false;
+    private boolean captureWhenAvailable = true;
     private Continuation<? extends Consumer<Bitmap>> cameraStreamRequestContinuation;
     private int cube_level;
 
@@ -128,7 +129,8 @@ public class AutoOpMode extends LinearOpMode {
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
 
-
+        Servo capper = hardwareMap.get(Servo.class, "capper");
+        capper.setPosition(CAPPER_STORED_POSITION);
 
         callbackHandler = CallbackLooper.getDefault().getHandler();
 
@@ -373,10 +375,22 @@ public class AutoOpMode extends LinearOpMode {
 
         while (!isStopRequested() && !isStarted()) {
 
+            telemetry.addData("Alliance Color Red(dpad left)", is_red ? "yes" : "no");
+            telemetry.addData("Alliance Color Blue(dpad right)", is_blue ? "yes" : "no");
+            telemetry.addData("Wait(a/b)", wait_choice ? "yes" : "no");
+            telemetry.addData("Just Park(x/y)", just_park ? "yes" : "no");
+            telemetry.addData("Skip duck(dpad up/dpad down)", skip_duck ? "yes" : "no");
+            telemetry.addData("Just duck(right bumper/left bumper)", just_duck ? "yes" : "no");
+            telemetry.addData("visionary auto (left trigger/right trigger)", visionary_auto ? "yes" : "no");
+
+            telemetry.addData("", ""); // blank line to separate configuration from actual telemetry
+
+            telemetry.addData("cube level", String.format("%d", cube_level));
+
             if (captureWhenAvailable) {
                 Bitmap bmp = frameQueue.poll();
                 if (bmp != null) {
-                    captureWhenAvailable = false;
+                    //captureWhenAvailable = false;
                     onNewFrame(bmp);
                 }
             }
@@ -419,14 +433,6 @@ public class AutoOpMode extends LinearOpMode {
 
 
 
-            telemetry.addData("Alliance Color Red(dpad left)", is_red ? "yes" : "no");
-            telemetry.addData("Alliance Color Blue(dpad right)", is_blue ? "yes" : "no");
-            telemetry.addData("Wait(a/b)", wait_choice ? "yes" : "no");
-            telemetry.addData("Just Park(x/y)", just_park ? "yes" : "no");
-            telemetry.addData("Skip duck(dpad up/dpad down)", skip_duck ? "yes" : "no");
-            telemetry.addData("Just duck(right bumper/left bumper)", just_duck ? "yes" : "no");
-            telemetry.addData("visionary auto (left trigger/right trigger)", visionary_auto ? "yes" : "no");
-            telemetry.addData("cube level", String.format("%d", cube_level));
             telemetry.update();
         }
     }
@@ -486,7 +492,6 @@ public class AutoOpMode extends LinearOpMode {
         telemetry.addData("left:", String.format("%06X", leftyellow));
         telemetry.addData("mid:", String.format("%06X", midyellow));
         telemetry.addData("right:", String.format("%06X", rightyellow));
-        telemetry.update();
 
         if( leftyellow>midyellow && leftyellow>rightyellow) {
             cube_level=1;
@@ -498,18 +503,21 @@ public class AutoOpMode extends LinearOpMode {
             cube_level=3;
         }
 
-
-        DrawRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
-        DrawRectangle(bitmap, RIGHT_X, RIGHT_W, RIGHT_Y, RIGHT_H);
-        DrawRectangle(bitmap, MID_X, MID_W, MID_Y, MID_H);
-        cameraStreamRequestContinuation.dispatch(new ContinuationResult<Consumer<Bitmap>>() {
-            @Override
-            public void handle(Consumer<Bitmap> consumer) {
-                consumer.accept(bitmap);
-            }
-        });
-        saveBitmap(bitmap);
-        //bitmap.recycle(); // not strictly necessary, but helpful
+        if (cameraStreamRequestContinuation != null) {
+            DrawRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
+            DrawRectangle(bitmap, RIGHT_X, RIGHT_W, RIGHT_Y, RIGHT_H);
+            DrawRectangle(bitmap, MID_X, MID_W, MID_Y, MID_H);
+            cameraStreamRequestContinuation.dispatch(new ContinuationResult<Consumer<Bitmap>>() {
+                @Override
+                public void handle(Consumer<Bitmap> consumer) {
+                    consumer.accept(bitmap);
+                }
+            });
+            cameraStreamRequestContinuation = null;
+            saveBitmap(bitmap);
+        } else {
+            bitmap.recycle(); // not strictly necessary, but helpful
+        }
     }
     private int ComputeYellowness (int color){
         int red = (color & 0x00FF0000) >> 16;

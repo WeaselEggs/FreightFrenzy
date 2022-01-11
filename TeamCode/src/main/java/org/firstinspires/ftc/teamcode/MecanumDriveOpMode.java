@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -24,8 +25,8 @@ public class MecanumDriveOpMode extends LinearOpMode {
 
     private static final double CAPPER_STORED_POSITION = .8;
     private static final double CAPPER_TRAVEL_POSITION = .65;
-    private static final double CAPPER_CAPPING_POSITION = .4
-    private static final double CAPPER_PICKUP_POSITION =.25
+    private static final double CAPPER_CAPPING_POSITION = .4;
+    private static final double CAPPER_PICKUP_POSITION =.25;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -47,6 +48,9 @@ public class MecanumDriveOpMode extends LinearOpMode {
 
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
+
+        Servo capper = hardwareMap.get(Servo.class, "capper");
+         capper.setPosition(CAPPER_STORED_POSITION);
 
         waitForStart();
 
@@ -198,13 +202,24 @@ public class MecanumDriveOpMode extends LinearOpMode {
 
             }
 
+
             int slide_ticks = slide.getCurrentPosition();
             telemetry.addData("Slide Encoder:", String.format("%d", slide_ticks));
             telemetry.update();
-
-
-
+            if(gamepad1.dpad_up){
+                capper.setPosition(CAPPER_TRAVEL_POSITION);
+            }
+            if(gamepad1.dpad_right){
+                capper.setPosition(CAPPER_CAPPING_POSITION);
+            }
+            if(gamepad1.dpad_left){
+                capper.setPosition(CAPPER_STORED_POSITION);
+            }
+            if (gamepad1.dpad_down) {
+                capper.setPosition(CAPPER_PICKUP_POSITION);
+            }
 
         }
+
     }
 }
