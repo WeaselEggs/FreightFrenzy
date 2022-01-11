@@ -21,6 +21,12 @@ public class MecanumDriveOpMode extends LinearOpMode {
     private static final double DROPOFF_POSITION = 0.43;
     private static final double OBSTACLE_POSITION = 0.27;
 
+
+    private static final double CAPPER_STORED_POSITION = .8;
+    private static final double CAPPER_TRAVEL_POSITION = .65;
+    private static final double CAPPER_CAPPING_POSITION = .4
+    private static final double CAPPER_PICKUP_POSITION =.25
+
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor front_left = hardwareMap.get(DcMotor.class, "front_left");
@@ -29,8 +35,8 @@ public class MecanumDriveOpMode extends LinearOpMode {
         DcMotor back_left = hardwareMap.get(DcMotor.class, "back_left");
         front_right.setDirection(DcMotorSimple.Direction.REVERSE);
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
-        front_left.setDirection(DcMotorSimple.Direction.REVERSE);
-        back_left.setDirection(DcMotorSimple.Direction.REVERSE);
+ //       front_left.setDirection(DcMotorSimple.Direction.REVERSE);
+//        back_left.setDirection(DcMotorSimple.Direction.REVERSE);
 
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
@@ -78,7 +84,7 @@ public class MecanumDriveOpMode extends LinearOpMode {
             }
 
             double carousel_power;
-            if (gamepad2.dpad_down) {
+            if (gamepad2.dpad_down||gamepad1.left_trigger>0.5) {
                 carousel_power = 0.6;
             } else {
                 carousel_power = 0;

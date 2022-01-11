@@ -122,7 +122,7 @@ public class ConceptWebcam extends LinearOpMode {
 
     private boolean captureWhenAvailable = false;
     private Continuation<? extends Consumer<Bitmap>> cameraStreamRequestContinuation;
-
+    private int cube_level;
     //----------------------------------------------------------------------------------------------
     // Main OpMode entry
     //----------------------------------------------------------------------------------------------
@@ -178,13 +178,23 @@ public class ConceptWebcam extends LinearOpMode {
         telemetry.addData("MID AVERAGE:", String.format("%06X", midAverageColor));
         int rightAverageColor = MeasureRectangle(bitmap, RIGHT_X, RIGHT_W, RIGHT_Y, RIGHT_H);
         telemetry.addData("RIGHT AVERAGE:", String.format("%06X", rightAverageColor));
-        int leftLeft= ComputeYellowness(leftAverageColor);
-        int midMid= ComputeYellowness(midAverageColor);
-        int rightRight= ComputeYellowness(rightAverageColor);
-        telemetry.addData("left:", String.format("%06X", leftLeft));
-        telemetry.addData("mid:", String.format("%06X", midMid));
-        telemetry.addData("right:", String.format("%06X", rightRight));
+        int leftyellow= ComputeYellowness(leftAverageColor);
+        int midyellow= ComputeYellowness(midAverageColor);
+        int rightyellow= ComputeYellowness(rightAverageColor);
+        telemetry.addData("left:", String.format("%06X", leftyellow));
+        telemetry.addData("mid:", String.format("%06X", midyellow));
+        telemetry.addData("right:", String.format("%06X", rightyellow));
         telemetry.update();
+
+        if( leftyellow>midyellow && leftyellow>rightyellow) {
+            cube_level=1;
+        }
+        if( midyellow>leftyellow && midyellow>rightyellow) {
+            cube_level=2;
+        }
+        if( rightyellow>midyellow && rightyellow>leftyellow) {
+            cube_level=3;
+        }
 
 
         DrawRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);

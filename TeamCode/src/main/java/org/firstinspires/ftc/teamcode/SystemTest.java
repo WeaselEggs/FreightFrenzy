@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -29,14 +30,15 @@ public class SystemTest extends LinearOpMode {
         DcMotor back_left = hardwareMap.get(DcMotor.class, "back_left");
         front_right.setDirection(DcMotorSimple.Direction.REVERSE);
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
-        front_left.setDirection(DcMotorSimple.Direction.REVERSE);
-        back_left.setDirection(DcMotorSimple.Direction.REVERSE);
 
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
         CRServo carousel_spin_blue = hardwareMap.get(CRServo.class, "carousel_spin_blue");
 
         CRServo carousel_spin_red = hardwareMap.get(CRServo.class, "carousel_spin_red");
+        Servo capper = hardwareMap.get(Servo.class, "capper");
+        float capper_position= 0;
+
 
         //CRServo intake_spin = hardwareMap.get(CRServo.class, "intake_spin");
         //intake_pivot.setPosition(CUBE_INTAKE_POSITION);
@@ -46,7 +48,8 @@ public class SystemTest extends LinearOpMode {
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        boolean old_left_bumper=false;
+        boolean old_right_bumper=false;
         while (!isStopRequested()){
 /*
             double rotated_x = -gamepad1.left_stick_y;
@@ -112,9 +115,21 @@ public class SystemTest extends LinearOpMode {
 
             if (gamepad1.b) {
                 slide.setTargetPosition(350);
+
             }
+            if(gamepad1.left_bumper && !old_left_bumper){
+                capper_position += .05;
+            }
+            if(gamepad1.right_bumper&& !old_right_bumper){
+                capper_position -= .05;
+            }
+            old_left_bumper= gamepad1.left_bumper;
+            old_right_bumper=gamepad1.right_bumper;
+            capper.setPosition(capper_position);
 
             telemetry.addData("Slide Encoder:", String.format("%d", slide_ticks));
+
+            telemetry.addData("finger position", String.format("%.2f", capper_position));
 
 
            /*
