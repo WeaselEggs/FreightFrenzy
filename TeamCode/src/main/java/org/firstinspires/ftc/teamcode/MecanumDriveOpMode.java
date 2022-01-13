@@ -17,16 +17,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 public class MecanumDriveOpMode extends LinearOpMode {
-    private static final double BALL_INTAKE_POSITION = 0.50;
-    private static final double CUBE_INTAKE_POSITION = 0.625;
-    private static final double DROPOFF_POSITION = 0.43;
-    private static final double OBSTACLE_POSITION = 0.27;
-
-
     private static final double CAPPER_STORED_POSITION = .8;
     private static final double CAPPER_TRAVEL_POSITION = .65;
     private static final double CAPPER_CAPPING_POSITION = .4;
     private static final double CAPPER_PICKUP_POSITION =.25;
+
+    private static final int SLIDE_BOTTOM_TICKS = 0;
+    private static final int SLIDE_LEVEL1_TICKS = 380;
+    private static final int SLIDE_LEVEL2_TICKS = 803;
+    private static final int SLIDE_LEVEL3_TICKS = 1358;
+    private static final int SLIDE_CAPPER_HOVER_TICKS = 1635;
+    private static final int SLIDE_CAPPER_CAPPING_TICKS = 1280;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,11 +37,8 @@ public class MecanumDriveOpMode extends LinearOpMode {
         DcMotor back_left = hardwareMap.get(DcMotor.class, "back_left");
         front_right.setDirection(DcMotorSimple.Direction.REVERSE);
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
- //       front_left.setDirection(DcMotorSimple.Direction.REVERSE);
-//        back_left.setDirection(DcMotorSimple.Direction.REVERSE);
 
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
-
 
         DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
         carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -50,7 +48,7 @@ public class MecanumDriveOpMode extends LinearOpMode {
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
 
         Servo capper = hardwareMap.get(Servo.class, "capper");
-         capper.setPosition(CAPPER_STORED_POSITION);
+        capper.setPosition(CAPPER_STORED_POSITION);
 
         waitForStart();
 
@@ -65,12 +63,10 @@ public class MecanumDriveOpMode extends LinearOpMode {
         boolean slide_stable = true;
 
         while (!isStopRequested()) {
-
+            // DRIVE: Mecanum Drive
             double speed = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
-
-            // Mecanum Drive
             double front_left_power = (speed + strafe + rotate);
             double front_right_power = (speed - strafe - rotate);
             double back_left_power = (speed - strafe + rotate);
@@ -86,126 +82,103 @@ public class MecanumDriveOpMode extends LinearOpMode {
             if (gamepad1.right_bumper || gamepad1.left_bumper) {
                 scale /= 3;
             }
+            front_left.setPower(scale * front_left_power);
+            front_right.setPower(scale * front_right_power);
+            back_left.setPower(scale * back_left_power);
+            back_right.setPower(scale * back_right_power);
 
+            // CAROUSEL
             double carousel_power;
             if (gamepad2.dpad_down||gamepad1.left_trigger>0.5) {
                 carousel_power = 0.6;
             } else {
                 carousel_power = 0;
             }
-
             carousel_spin_blue.setPower(carousel_power);
             carousel_spin_red.setPower(carousel_power);
 
-            front_left.setPower(scale * front_left_power);
-            front_right.setPower(scale * front_right_power);
-            back_left.setPower(scale * back_left_power);
-            back_right.setPower(scale * back_right_power);
-
-
+            // INTAKE
             double intake_power = gamepad2.right_trigger - gamepad2.left_trigger;
-
             if (gamepad2.left_bumper) {
                 intake_power /= 3;
             }
-
             intake_left.setPower(-intake_power);
             intake_right.setPower(intake_power);
 
-            double slide_power;
-            boolean slide_at_bottom = false;
-
-            slide_power = -gamepad2.right_stick_y / 1.75;
-            slide_power = Math.signum(slide_power) * Math.pow(Math.abs(slide_power), 1.5);
-
+            // SLIDE: move slides to specific positions
             if (gamepad2.dpad_up) {
-
                 slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 slide_stable = true;
-
-            } else if (gamepad2.y) {
-
-                //stage 3
-                slide.setTargetPosition(1358);
+            } else if (gamepad2.y) { // move slide to level 3
+                slide.setTargetPosition(SLIDE_LEVEL3_TICKS);
                 slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slide.setPower(0.35);
                 slide_stable = true;
-
-            } else if (gamepad2.b) {
-
-                // stage 2
-                slide.setTargetPosition(803);
+            } else if (gamepad2.b) { // move slide to level 2
+                slide.setTargetPosition(SLIDE_LEVEL2_TICKS);
                 slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slide.setPower(0.35);
                 slide_stable = true;
-
-            } else if (gamepad2.x||gamepad1.a) {
-
-                //stage 1
-                slide.setTargetPosition(380);
+            } else if (gamepad2.x||gamepad1.a) { // move slide to level 1
+                slide.setTargetPosition(SLIDE_LEVEL1_TICKS);
                 slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slide.setPower(0.35);
                 slide_stable = true;
-
-             }else if (gamepad2.a) {
-
-                //bottom
-                slide.setTargetPosition(0);
+             } else if (gamepad2.a) { // move slide to bottom
+                slide.setTargetPosition(SLIDE_BOTTOM_TICKS);
                 slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slide.setPower(0.45);
                 slide_stable = true;
-
+            } else if (gamepad2.dpad_left) { // move slide to capping hover position
+                slide.setTargetPosition(SLIDE_CAPPER_HOVER_TICKS);
+                slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide.setPower(0.35);
+                slide_stable = true;
+            } else if (gamepad2.dpad_right) { // move slide to capping drop position
+                slide.setTargetPosition(SLIDE_CAPPER_CAPPING_TICKS);
+                slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide.setPower(0.35);
+                slide_stable = true;
             }
 
-//            else if (slide_power < 0 && slide.getCurrentPosition() < 0) {
-//                slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//                slide_power = 0;
-//                slide_at_bottom = true;
-
-//            }
-            //slide slowmode
+            // SLIDE: slide manual mode
+            double slide_power = -gamepad2.right_stick_y / 1.75;
+            slide_power = Math.signum(slide_power) * Math.pow(Math.abs(slide_power), 1.5);
+            // slide slowmode
             if (gamepad2.right_bumper) {
-
                 slide_power *= 0.3;
-
             }
+
+            // SLIDE: hold slide in place when we reach target position
             if (Math.abs(slide_power) < 0.05) {
                 if (!slide_stable) {
                     if (slide_timer.milliseconds() < 200) {
-
                         slide.setPower(0.05);
-
                     } else {
-
                         slide.setTargetPosition(slide.getCurrentPosition());
                         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                         slide.setPower(0.08);
                         slide_stable = true;
-
                     }
                 }
             } else {
                 if (slide_stable) {
-
                     slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     slide_stable = false;
-
                 }
 
                 slide_timer.reset();
                 slide.setPower(slide_power);
-
             }
 
-
-            int slide_ticks = slide.getCurrentPosition();
-            telemetry.addData("Slide Encoder:", String.format("%d", slide_ticks));
-            telemetry.update();
+            // CAPPER
             if(gamepad1.dpad_up){
                 capper.setPosition(CAPPER_TRAVEL_POSITION);
             }
@@ -219,7 +192,9 @@ public class MecanumDriveOpMode extends LinearOpMode {
                 capper.setPosition(CAPPER_PICKUP_POSITION);
             }
 
-        }
-
+            int slide_ticks = slide.getCurrentPosition();
+            telemetry.addData("Slide Encoder:", String.format("%d", slide_ticks));
+            telemetry.update();
+        } // while
     }
 }
