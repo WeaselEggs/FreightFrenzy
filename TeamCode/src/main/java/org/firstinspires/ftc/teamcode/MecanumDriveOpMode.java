@@ -41,8 +41,8 @@ public class MecanumDriveOpMode extends LinearOpMode {
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
         DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
-        carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
+        carousel_spin_red.setDirection(DcMotorSimple.Direction.REVERSE);
 
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
@@ -98,7 +98,7 @@ public class MecanumDriveOpMode extends LinearOpMode {
             carousel_spin_red.setPower(carousel_power);
 
             // INTAKE
-            double intake_power = gamepad2.right_trigger - gamepad2.left_trigger;
+            double intake_power = gamepad2.left_trigger - gamepad2.right_trigger;
             if (gamepad2.left_bumper) {
                 intake_power /= 3;
             }

@@ -59,12 +59,17 @@ public class AutoOpMode extends LinearOpMode {
     private boolean skip_duck = false;
     private boolean just_duck = false;
     private boolean visionary_auto=true;
+    private boolean vision_spinner=false;
+    // vision spinner vs vision barrier refers to location of setup
     private static final double BALL_INTAKE_POSITION = 0.50;
     private static final double CUBE_INTAKE_POSITION = 0.625;
     private static final double DROPOFF_POSITION = 0.43;
     private static final double OBSTACLE_POSITION = 0.27;
     private static final String TAG = "Webcam Sample";
     private static final double CAPPER_STORED_POSITION = .8;
+    private static final int SLIDE_LEVEL1_TICKS = 380;
+    private static final int SLIDE_LEVEL2_TICKS = 803;
+    private static final int SLIDE_LEVEL3_TICKS = 1358;
 
     private static final int LEFT_X = 3;
     private static final int LEFT_W = 89;
@@ -123,8 +128,8 @@ public class AutoOpMode extends LinearOpMode {
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
         DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
-        carousel_spin_blue.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
+        carousel_spin_red.setDirection(DcMotorSimple.Direction.REVERSE);
 
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
@@ -173,6 +178,91 @@ public class AutoOpMode extends LinearOpMode {
 
             //Waits for 10 seconds
             waitfor(10000);
+        }
+        if(visionary_auto==true){
+            if(vision_spinner==true){
+                drive(0,.6,0,1000);
+            }
+            else if (vision_spinner==false){
+                drive(0,-.6,0,1200);
+            }
+
+            if(cube_level==1){
+                slide.setTargetPosition(SLIDE_LEVEL1_TICKS);
+            }
+            else if(cube_level==2 ){
+                slide.setTargetPosition(SLIDE_LEVEL2_TICKS);
+            }
+            else if(cube_level==3||cube_level==0){
+                slide.setTargetPosition(SLIDE_LEVEL3_TICKS);
+            }
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.35);
+            slide_stable = true;
+
+//          drive to fountain
+            drive(.55,0, 0, 300);
+            drive(.25,0,0,950);
+
+            // outtake
+            drive(.1,0,0,100);
+            waitfor(100);
+            intake_left.setPower(.5);
+            intake_right.setPower(-.5);
+            waitfor(800);
+
+            //Stop out-take
+            intake_left.setPower(0);
+            intake_right.setPower(0);
+
+            drive(-.55,0,0,775);
+            drive(0,-.55,0,2150);
+
+//           lower lift
+            slide.setTargetPosition(380);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.35);
+            slide_stable = true;
+
+            //just duck style drive toward carousel
+            drive(.55,0,0,500);
+            drive(0, -.55, 0, 500);
+            drive(-.45,0,0,300);
+            drive(-.1, 0, 0, 600);
+
+            //Spin the carousel spinners
+            if (is_blue == true) {
+                carousel_spin_blue.setPower(-.35);
+            } else if (is_red == true) {
+                carousel_spin_red.setPower(.35);
+            }
+            waitfor(4000);
+
+            if (is_blue == true) {
+                carousel_spin_blue.setPower(0);
+            } else if (is_red == true) {
+                carousel_spin_red.setPower(0);
+            }
+            //drive away from carousel, rotate, drive into the warehouse
+            drive(.2,0,0,100);
+            drive(0,0,.55,750);
+            drive(.55,0,0,5850);
+
+
+            //Slide kit to stage 2
+            slide.setTargetPosition(803);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setPower(0.45);
+            slide_stable = true;
+
+            waitfor(2000);
+
+
+
+
         }
         if (just_duck == true) {
 
@@ -280,7 +370,7 @@ public class AutoOpMode extends LinearOpMode {
                 carousel_spin_red.setPower(0);
             }
 
-            //Go forward until the alliance shipping hub
+            //Go forward until distance from wall of the alliance shipping hub
             drive(.25,0, 0, 950);
 
             //Slide kit to stage 3
@@ -290,7 +380,7 @@ public class AutoOpMode extends LinearOpMode {
             slide.setPower(0.35);
             slide_stable = true;
 
-            //Strafe right and forward toward the alliance shipping hub
+            //Strafe right and drive the rest of the way to the alliance shipping hub
             drive(0,.55,0,2150);
             drive(.55,0, 0, 300);
 
@@ -382,6 +472,7 @@ public class AutoOpMode extends LinearOpMode {
             telemetry.addData("Skip duck(dpad up/dpad down)", skip_duck ? "yes" : "no");
             telemetry.addData("Just duck(right bumper/left bumper)", just_duck ? "yes" : "no");
             telemetry.addData("visionary auto (left trigger/right trigger)", visionary_auto ? "yes" : "no");
+            telemetry.addData("visionary auto side(start/back)", vision_spinner ? "spinner": "barrier");
 
             telemetry.addData("", ""); // blank line to separate configuration from actual telemetry
 
@@ -430,8 +521,12 @@ public class AutoOpMode extends LinearOpMode {
             if(gamepad1.right_trigger>.5) {
                 visionary_auto = true;
             }
-
-
+            if(gamepad1.start){
+                vision_spinner=false;
+            }
+            if(gamepad1.back){
+                vision_spinner=true;
+            }
 
             telemetry.update();
         }
