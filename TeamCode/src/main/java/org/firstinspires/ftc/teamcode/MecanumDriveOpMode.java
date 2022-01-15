@@ -133,19 +133,29 @@ public class MecanumDriveOpMode extends LinearOpMode {
                 slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slide.setPower(0.45);
                 slide_stable = true;
-            } else if (gamepad2.dpad_left) { // move slide to capping hover position
+            }
+            else if (gamepad1.x) { // move slide to capping hover position
                 slide.setTargetPosition(SLIDE_CAPPER_HOVER_TICKS);
                 slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slide.setPower(0.35);
                 slide_stable = true;
-            } else if (gamepad2.dpad_right) { // move slide to capping drop position
+            }
+            else if (gamepad1.y) { // move slide to capping drop position
                 slide.setTargetPosition(SLIDE_CAPPER_CAPPING_TICKS);
                 slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slide.setPower(0.35);
                 slide_stable = true;
             }
+            else if (gamepad1.b){
+                slide.setTargetPosition(SLIDE_BOTTOM_TICKS);
+                slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide.setPower(0.35);
+                slide_stable = true;
+            }
+
 
             // SLIDE: slide manual mode
             double slide_power = -gamepad2.right_stick_y / 1.75;

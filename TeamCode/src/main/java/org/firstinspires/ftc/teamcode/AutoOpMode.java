@@ -71,18 +71,18 @@ public class AutoOpMode extends LinearOpMode {
     private static final int SLIDE_LEVEL2_TICKS = 803;
     private static final int SLIDE_LEVEL3_TICKS = 1358;
 
-    private static final int LEFT_X = 3;
-    private static final int LEFT_W = 89;
-    private static final int LEFT_Y = 230;
-    private static final int LEFT_H = 140;
-    private static final int RIGHT_X = 573;
-    private static final int RIGHT_W = 66;
-    private static final int RIGHT_Y = 243;
-    private static final int RIGHT_H = 143;
-    private static final int MID_X = 255;
-    private static final int MID_W = 104;
-    private static final int MID_Y = 236;
-    private static final int MID_H = 142;
+    private static final int LEFT_X = 23;
+    private static final int LEFT_W = 91;
+    private static final int LEFT_Y = 296;
+    private static final int LEFT_H = 146;
+    private static final int RIGHT_X = 526;
+    private static final int RIGHT_W = 113;
+    private static final int RIGHT_Y = 296;
+    private static final int RIGHT_H = 149;
+    private static final int MID_X = 298;
+    private static final int MID_W = 108;
+    private static final int MID_Y = 296;
+    private static final int MID_H = 138;
     //----------------------------------------------------------------------------------------------
     // State
     //----------------------------------------------------------------------------------------------
@@ -134,6 +134,8 @@ public class AutoOpMode extends LinearOpMode {
         CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
         CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
 
+
+
         Servo capper = hardwareMap.get(Servo.class, "capper");
         capper.setPosition(CAPPER_STORED_POSITION);
 
@@ -181,10 +183,10 @@ public class AutoOpMode extends LinearOpMode {
         }
         if(visionary_auto==true){
             if(vision_spinner==true){
-                drive(0,.6,0,1000);
+                drive(0,.6,0,1150);
             }
             else if (vision_spinner==false){
-                drive(0,-.6,0,1200);
+                drive(0,-.6,0,1000);
             }
 
             if(cube_level==1){
@@ -202,21 +204,28 @@ public class AutoOpMode extends LinearOpMode {
             slide_stable = true;
 
 //          drive to fountain
-            drive(.55,0, 0, 300);
+            drive(.55,0, 0, 400);
             drive(.25,0,0,950);
 
+            if(cube_level==2 ){
+                drive(.2,0,0,230);
+            }
+            if(cube_level==3||cube_level==0){
+                drive(.2,0,0,450);
+            }
             // outtake
             drive(.1,0,0,100);
             waitfor(100);
-            intake_left.setPower(.5);
-            intake_right.setPower(-.5);
+            intake_left.setPower(-.5);
+            intake_right.setPower(.5);
             waitfor(800);
 
             //Stop out-take
             intake_left.setPower(0);
             intake_right.setPower(0);
 
-            drive(-.55,0,0,775);
+            drive(-.55,0,0,720);
+            drive(.1,0,0,50);
             drive(0,-.55,0,2150);
 
 //           lower lift
@@ -228,8 +237,8 @@ public class AutoOpMode extends LinearOpMode {
 
             //just duck style drive toward carousel
             drive(.55,0,0,500);
-            drive(0, -.55, 0, 500);
-            drive(-.45,0,0,300);
+            drive(0, -.55, 0, 470);
+            drive(-.45,0,0,280);
             drive(-.1, 0, 0, 600);
 
             //Spin the carousel spinners
@@ -238,7 +247,7 @@ public class AutoOpMode extends LinearOpMode {
             } else if (is_red == true) {
                 carousel_spin_red.setPower(.35);
             }
-            waitfor(4000);
+            waitfor(4500);
 
             if (is_blue == true) {
                 carousel_spin_blue.setPower(0);
@@ -246,9 +255,9 @@ public class AutoOpMode extends LinearOpMode {
                 carousel_spin_red.setPower(0);
             }
             //drive away from carousel, rotate, drive into the warehouse
-            drive(.2,0,0,100);
-            drive(0,0,.55,750);
-            drive(.55,0,0,5850);
+            drive(.2,0,0,300);
+            drive(0,0,.55,680);
+            drive(.6,0,0,5700);
 
 
             //Slide kit to stage 2
@@ -264,7 +273,7 @@ public class AutoOpMode extends LinearOpMode {
 
 
         }
-        if (just_duck == true) {
+       else if (just_duck == true) {
 
             //Strafe left toward carousel
             drive(.55,0,0,500);
@@ -274,9 +283,9 @@ public class AutoOpMode extends LinearOpMode {
 
             //Spin the carousel spinners
             if (is_blue == true) {
-                carousel_spin_blue.setPower(-.35);
+                carousel_spin_blue.setPower(-.4);
             } else if (is_red == true) {
-                carousel_spin_red.setPower(.35);
+                carousel_spin_red.setPower(.4);
             }
             waitfor(3850);
 
@@ -310,8 +319,8 @@ public class AutoOpMode extends LinearOpMode {
             //Out-take the cube
             drive(.1,0,0,100);
             waitfor(100);
-            intake_left.setPower(.5);
-            intake_right.setPower(-.5);
+            intake_left.setPower(-.5);
+            intake_right.setPower(.5);
             waitfor(800);
 
             //Stop out-take
@@ -326,7 +335,7 @@ public class AutoOpMode extends LinearOpMode {
             slide_stable = true;
 
             //Strafe and rotate
-            drive(-.55,0,0,200);
+            drive(-.55,0,0,1800);
             if (is_red == true) {
                 drive(0,0,.5,750);
             } else if (is_blue == true) {
@@ -371,7 +380,7 @@ public class AutoOpMode extends LinearOpMode {
             }
 
             //Go forward until distance from wall of the alliance shipping hub
-            drive(.25,0, 0, 950);
+            drive(.25,0, 0, 920);
 
             //Slide kit to stage 3
             slide.setTargetPosition(1364);
@@ -381,15 +390,15 @@ public class AutoOpMode extends LinearOpMode {
             slide_stable = true;
 
             //Strafe right and drive the rest of the way to the alliance shipping hub
-            drive(0,.55,0,2150);
-            drive(.55,0, 0, 300);
+            drive(0,.55,0,2300);
+            drive(.55,0, 0, 200);
 
 
             //Out-take the cube
             drive(.1,0,0,100);
             waitfor(100);
-            intake_left.setPower(.5);
-            intake_right.setPower(-.5);
+            intake_left.setPower(-.5);
+            intake_right.setPower(.5);
             waitfor(800);
 
             //Stop out-take
@@ -520,6 +529,9 @@ public class AutoOpMode extends LinearOpMode {
             }
             if(gamepad1.right_trigger>.5) {
                 visionary_auto = true;
+            }
+            if(gamepad1.left_trigger>.5){
+                visionary_auto=false;
             }
             if(gamepad1.start){
                 vision_spinner=false;
