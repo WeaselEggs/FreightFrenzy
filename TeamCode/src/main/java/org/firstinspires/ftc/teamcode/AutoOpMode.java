@@ -52,24 +52,24 @@ public class AutoOpMode extends LinearOpMode {
     private DcMotor front_right;
     private DcMotor back_left;
     private DcMotor back_right;
-    private boolean is_blue = false;
-    private boolean is_red = true;
+//    private boolean is_blue = false;
+//    private boolean is_red = true;
     private boolean wait_choice = false;
-    private boolean just_park = false;
-    private boolean skip_duck = false;
-    private boolean just_duck = false;
-    private boolean visionary_auto=true;
-    private boolean vision_spinner=false;
+    private boolean strafe_left = false;
+//    private boolean skip_duck = false;
+//    private boolean just_duck = false;
+//    private boolean visionary_auto=true;
+//    private boolean vision_spinner=false;
     // vision spinner vs vision barrier refers to location of setup
-    private static final double BALL_INTAKE_POSITION = 0.50;
-    private static final double CUBE_INTAKE_POSITION = 0.625;
-    private static final double DROPOFF_POSITION = 0.43;
-    private static final double OBSTACLE_POSITION = 0.27;
+//    private static final double BALL_INTAKE_POSITION = 0.50;
+//    private static final double CUBE_INTAKE_POSITION = 0.625;
+//    private static final double DROPOFF_POSITION = 0.43;
+//    private static final double OBSTACLE_POSITION = 0.27;
     private static final String TAG = "Webcam Sample";
-    private static final double CAPPER_STORED_POSITION = .8;
-    private static final int SLIDE_LEVEL1_TICKS = 380;
-    private static final int SLIDE_LEVEL2_TICKS = 803;
-    private static final int SLIDE_LEVEL3_TICKS = 1358;
+//    private static final double CAPPER_STORED_POSITION = .8;
+//    private static final int SLIDE_LEVEL1_TICKS = 380;
+//    private static final int SLIDE_LEVEL2_TICKS = 803;
+//    private static final int SLIDE_LEVEL3_TICKS = 1358;
 
     private static final int LEFT_X = 23;
     private static final int LEFT_W = 91;
@@ -112,7 +112,7 @@ public class AutoOpMode extends LinearOpMode {
 
     private boolean captureWhenAvailable = true;
     private Continuation<? extends Consumer<Bitmap>> cameraStreamRequestContinuation;
-    private int cube_level;
+//    private int cube_level;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -125,348 +125,69 @@ public class AutoOpMode extends LinearOpMode {
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
-        DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
+//        DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
-        DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
-        DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
-        carousel_spin_red.setDirection(DcMotorSimple.Direction.REVERSE);
+//        DcMotor carousel_spin_blue = hardwareMap.get(DcMotor.class, "carousel_spin_blue");
+//        DcMotor carousel_spin_red = hardwareMap.get(DcMotor.class, "carousel_spin_red");
+//        carousel_spin_red.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
-        CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
+//        CRServo intake_left = hardwareMap.get(CRServo.class, "intake_left");
+//        CRServo intake_right = hardwareMap.get(CRServo.class, "intake_right");
 
 
 
-        Servo capper = hardwareMap.get(Servo.class, "capper");
-        capper.setPosition(CAPPER_STORED_POSITION);
+//        Servo capper = hardwareMap.get(Servo.class, "capper");
+//        capper.setPosition(CAPPER_STORED_POSITION);
 
-        callbackHandler = CallbackLooper.getDefault().getHandler();
+//        callbackHandler = CallbackLooper.getDefault().getHandler();
 
-        cameraManager = ClassFactory.getInstance().getCameraManager();
-        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+//        cameraManager = ClassFactory.getInstance().getCameraManager();
+//        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
-        initializeFrameQueue(2);
-        AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
+//        initializeFrameQueue(2);
+//        AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
 
-        CameraStreamServer.getInstance().setSource(new CameraStreamSource() {
-            @Override
-            public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
-                cameraStreamRequestContinuation = continuation;
-                captureWhenAvailable = true;
-            }
-        });
+//        CameraStreamServer.getInstance().setSource(new CameraStreamSource() {
+//            @Override
+//            public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+//                cameraStreamRequestContinuation = continuation;
+//                captureWhenAvailable = true;
+//            }
+//        });
 
         try {
-            openCamera();
-            if (camera == null) return;
-
-            startCamera();
-            if (cameraCaptureSession == null) return;
+//            openCamera();
+//            if (camera == null) return;
+//
+//            startCamera();
+//            if (cameraCaptureSession == null) return;
 
             choosewell();
         } finally {
-            closeCamera();
+//            closeCamera();
         }
 
 
-        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        ElapsedTime slide_timer = new ElapsedTime();
-        boolean slide_stable = true;
-        double slide_power;
-        int slide_ticks = slide.getCurrentPosition();
+//        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        ElapsedTime slide_timer = new ElapsedTime();
+//        boolean slide_stable = true;
+//        double slide_power;
+//        int slide_ticks = slide.getCurrentPosition();
 
         if (wait_choice == true) {
 
             //Waits for 10 seconds
             waitfor(10000);
         }
-        if(visionary_auto==true){
-            if(vision_spinner==true){
-                drive(0,.6,0,1150);
-            }
-            else if (vision_spinner==false){
-                drive(0,-.6,0,1000);
-            }
-
-            if(cube_level==1){
-                slide.setTargetPosition(SLIDE_LEVEL1_TICKS);
-            }
-            else if(cube_level==2 ){
-                slide.setTargetPosition(SLIDE_LEVEL2_TICKS);
-            }
-            else if(cube_level==3||cube_level==0){
-                slide.setTargetPosition(SLIDE_LEVEL3_TICKS);
-            }
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.35);
-            slide_stable = true;
-
-//          drive to fountain
-            drive(.55,0, 0, 400);
-            drive(.25,0,0,950);
-
-            if(cube_level==2 ){
-                drive(.2,0,0,230);
-            }
-            if(cube_level==3||cube_level==0){
-                drive(.2,0,0,450);
-            }
-            // outtake
-            drive(.1,0,0,100);
-            waitfor(100);
-            intake_left.setPower(-.5);
-            intake_right.setPower(.5);
-            waitfor(800);
-
-            //Stop out-take
-            intake_left.setPower(0);
-            intake_right.setPower(0);
-
-            drive(-.55,0,0,720);
-            drive(.1,0,0,50);
-            drive(0,-.55,0,2150);
-
-//           lower lift
-            slide.setTargetPosition(380);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.35);
-            slide_stable = true;
-
-            //just duck style drive toward carousel
-            drive(.55,0,0,500);
-            drive(0, -.55, 0, 470);
-            drive(-.45,0,0,280);
-            drive(-.1, 0, 0, 600);
-
-            //Spin the carousel spinners
-            if (is_blue == true) {
-                carousel_spin_blue.setPower(-.35);
-            } else if (is_red == true) {
-                carousel_spin_red.setPower(.35);
-            }
-            waitfor(4500);
-
-            if (is_blue == true) {
-                carousel_spin_blue.setPower(0);
-            } else if (is_red == true) {
-                carousel_spin_red.setPower(0);
-            }
-            //drive away from carousel, rotate, drive into the warehouse
-            drive(.2,0,0,300);
-            drive(0,0,.55,680);
-            drive(.6,0,0,5700);
-
-
-            //Slide kit to stage 2
-            slide.setTargetPosition(803);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.45);
-            slide_stable = true;
-
-            waitfor(2000);
-
-
-
-
+        if(strafe_left==true){
+            drive(0,.6,0,1150);
         }
-       else if (just_duck == true) {
-
-            //Strafe left toward carousel
-            drive(.55,0,0,500);
-            drive(0, -.55, 0, 500);
-            drive(-.45,0,0,300);
-            drive(-.1, 0, 0, 600);
-
-            //Spin the carousel spinners
-            if (is_blue == true) {
-                carousel_spin_blue.setPower(-.4);
-            } else if (is_red == true) {
-                carousel_spin_red.setPower(.4);
-            }
-            waitfor(3850);
-
-            if (is_blue == true) {
-                carousel_spin_blue.setPower(0);
-            } else if (is_red == true) {
-                carousel_spin_red.setPower(0);
-            }
-
-            //Parks in Depot
-            drive(.55,0,0,550);
-            drive(0,-.55,0,150);
-
-
-        } else if (skip_duck == true) {
-
-            //Slide kit to stage 3
-            slide.setTargetPosition(1364);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.35);
-            slide_stable = true;
-
-            waitfor(1000);
-
-            //Go forward until the alliance shipping hub
-            drive(.55,0, 0, 300);
-            drive(.25,0,0,950);
-
-
-            //Out-take the cube
-            drive(.1,0,0,100);
-            waitfor(100);
-            intake_left.setPower(-.5);
-            intake_right.setPower(.5);
-            waitfor(800);
-
-            //Stop out-take
-            intake_left.setPower(0);
-            intake_right.setPower(0);
-
-            //Slide kit to stage 1
-            slide.setTargetPosition(380);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.35);
-            slide_stable = true;
-
-            //Strafe and rotate
-            drive(-.55,0,0,1800);
-            if (is_red == true) {
-                drive(0,0,.5,750);
-            } else if (is_blue == true) {
-                drive(0,0,-.5,750);
-            }
-
-
-            //Strafe right and parks in the warehouse
-            drive(.55, 0, 0 , 2000);
-            drive(0,-.55,0,200);
-            drive(.55,0,0,1700);
-
-            //Slide kit to stage 2
-            slide.setTargetPosition(803);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.45);
-            slide_stable = true;
-
-            waitfor(2000);
-
-
-        } else if (just_park == false) {
-            //Strafe left toward carousel
-            drive(.55,0,0,500);
-            drive(0, -.55, 0, 500);
-            drive(-.45,0,0,300);
-            drive(-.1, 0, 0, 600);
-
-            //Spin the carousel spinners
-            if (is_blue == true) {
-                carousel_spin_blue.setPower(-.35);
-            } else if (is_red == true) {
-                carousel_spin_red.setPower(.35);
-            }
-            waitfor(4000);
-
-            if (is_blue == true) {
-                carousel_spin_blue.setPower(0);
-            } else if (is_red == true) {
-                carousel_spin_red.setPower(0);
-            }
-
-            //Go forward until distance from wall of the alliance shipping hub
-            drive(.25,0, 0, 920);
-
-            //Slide kit to stage 3
-            slide.setTargetPosition(1364);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.35);
-            slide_stable = true;
-
-            //Strafe right and drive the rest of the way to the alliance shipping hub
-            drive(0,.55,0,2300);
-            drive(.55,0, 0, 200);
-
-
-            //Out-take the cube
-            drive(.1,0,0,100);
-            waitfor(100);
-            intake_left.setPower(-.5);
-            intake_right.setPower(.5);
-            waitfor(800);
-
-            //Stop out-take
-            intake_left.setPower(0);
-            intake_right.setPower(0);
-
-
-            //Strafe and rotate
-            drive(-.55,0,0,200);
-            if (is_red == true) {
-                drive(0,0,.5,750);
-            } else if (is_blue == true) {
-                drive(0,0,-.5,750);
-            }
-
-            //Slide kit to stage 1
-            slide.setTargetPosition(380);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.35);
-            slide_stable = true;
-
-
-            //Strafe right and parks in the warehouse
-            drive(.55, 0, 0 , 2000);
-            drive(0,-.55,0,200);
-            drive(.55,0,0,1700);
-
-            //Slide kit to stage 2
-            slide.setTargetPosition(803);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            slide.setPower(0.45);
-            slide_stable = true;
-
-            waitfor(2000);
-          
-
-        } else {
-
-            //Goes and parks into the warehouse
-            drive(.55,0, 0, 600);
-            drive(.55, 0, 0 , 3700);
+        else if (strafe_left==false){
+            drive(0,-.6,0,1000);
         }
 
-        slide_power = -gamepad2.right_stick_y / 1.75;
-        slide_power = Math.signum(slide_power) * Math.pow(Math.abs(slide_power), 1.5);
-
-        if (Math.abs(slide_power) < 0.05) {
-            if (!slide_stable) {
-                if (slide_timer.milliseconds() < 200) {
-                    slide.setPower(0.05);
-                } else {
-                    slide.setTargetPosition(slide.getCurrentPosition());
-                    slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    slide.setPower(0.35);
-                    slide_stable = true;
-                }
-            }
-        } else {
-            if (slide_stable) {
-                slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                slide_stable = false;
-            }
-            slide_timer.reset();
-            slide.setPower(slide_power);
-        }
     }
 
 
@@ -474,41 +195,41 @@ public class AutoOpMode extends LinearOpMode {
 
         while (!isStopRequested() && !isStarted()) {
 
-            telemetry.addData("Alliance Color Red(dpad left)", is_red ? "yes" : "no");
-            telemetry.addData("Alliance Color Blue(dpad right)", is_blue ? "yes" : "no");
+//            telemetry.addData("Alliance Color Red(dpad left)", is_red ? "yes" : "no");
+//            telemetry.addData("Alliance Color Blue(dpad right)", is_blue ? "yes" : "no");
             telemetry.addData("Wait(a/b)", wait_choice ? "yes" : "no");
-            telemetry.addData("Just Park(x/y)", just_park ? "yes" : "no");
-            telemetry.addData("Skip duck(dpad up/dpad down)", skip_duck ? "yes" : "no");
-            telemetry.addData("Just duck(right bumper/left bumper)", just_duck ? "yes" : "no");
-            telemetry.addData("visionary auto (left trigger/right trigger)", visionary_auto ? "yes" : "no");
-            telemetry.addData("visionary auto side(start/back)", vision_spinner ? "spinner": "barrier");
+            telemetry.addData("Stafe left/right(x/y)", strafe_left ? "left" : "yes");
+//            telemetry.addData("Skip duck(dpad up/dpad down)", skip_duck ? "yes" : "no");
+//            telemetry.addData("Just duck(right bumper/left bumper)", just_duck ? "yes" : "no");
+//            telemetry.addData("visionary auto (left trigger/right trigger)", visionary_auto ? "yes" : "no");
+//            telemetry.addData("visionary auto side(start/back)", vision_spinner ? "spinner": "barrier");
 
-            telemetry.addData("", ""); // blank line to separate configuration from actual telemetry
+//            telemetry.addData("", ""); // blank line to separate configuration from actual telemetry
 
-            telemetry.addData("cube level", String.format("%d", cube_level));
+//            telemetry.addData("cube level", String.format("%d", cube_level));
 
-            if (captureWhenAvailable) {
-                Bitmap bmp = frameQueue.poll();
-                if (bmp != null) {
-                    //captureWhenAvailable = false;
-                    onNewFrame(bmp);
-                }
-            }
+//            if (captureWhenAvailable) {
+//                Bitmap bmp = frameQueue.poll();
+//                if (bmp != null) {
+//                    //captureWhenAvailable = false;
+//                    onNewFrame(bmp);
+//                }
+//            }
             idle();
-            if (gamepad1.dpad_left) {
-                is_blue = false;
-                is_red = true;
-            }
-            if (gamepad1.dpad_right) {
-                is_red = false;
-                is_blue = true;
-            }
-            if(gamepad1.dpad_up) {
-              skip_duck = true;
-            }
-            if(gamepad1.dpad_down) {
-                skip_duck = false;
-            }
+//            if (gamepad1.dpad_left) {
+//                is_blue = false;
+//                is_red = true;
+//            }
+//            if (gamepad1.dpad_right) {
+//                is_red = false;
+//                is_blue = true;
+//            }
+//            if(gamepad1.dpad_up) {
+//              skip_duck = true;
+//            }
+//            if(gamepad1.dpad_down) {
+//                skip_duck = false;
+//            }
             if (gamepad1.a) {
                 wait_choice = true;
             }
@@ -516,29 +237,29 @@ public class AutoOpMode extends LinearOpMode {
                 wait_choice = false;
             }
             if(gamepad1.x) {
-                just_park = true;
+                strafe_left = true;
             }
             if(gamepad1.y) {
-                just_park = false;
+                strafe_left = false;
             }
-            if(gamepad1.right_bumper) {
-                just_duck = true;
-            }
-            if(gamepad1.left_bumper) {
-                just_duck = false;
-            }
-            if(gamepad1.right_trigger>.5) {
-                visionary_auto = true;
-            }
-            if(gamepad1.left_trigger>.5){
-                visionary_auto=false;
-            }
-            if(gamepad1.start){
-                vision_spinner=false;
-            }
-            if(gamepad1.back){
-                vision_spinner=true;
-            }
+//            if(gamepad1.right_bumper) {
+//                just_duck = true;
+//            }
+//            if(gamepad1.left_bumper) {
+//                just_duck = false;
+//            }
+//            if(gamepad1.right_trigger>.5) {
+//                visionary_auto = true;
+//            }
+//            if(gamepad1.left_trigger>.5){
+//                visionary_auto=false;
+//            }
+//            if(gamepad1.start){
+//                vision_spinner=false;
+//            }
+//            if(gamepad1.back){
+//                vision_spinner=true;
+//            }
 
             telemetry.update();
         }
@@ -547,9 +268,9 @@ public class AutoOpMode extends LinearOpMode {
 
     private void drive(double speed, double strafe, double rotate, long milis){
 
-        if (is_blue == true) {
-            strafe = -strafe;
-        }
+//        if (is_blue == true) {
+//            strafe = -strafe;
+//        }
 
         double front_left_power = (speed+strafe+rotate);
         double front_right_power = (speed-strafe-rotate);
@@ -585,8 +306,6 @@ public class AutoOpMode extends LinearOpMode {
 
     /** Do something with the frame */
     private void onNewFrame(Bitmap bitmap) {
-
-
         int leftAverageColor = MeasureRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
         telemetry.addData("Left average:", String.format("%06X", leftAverageColor));
         int midAverageColor = MeasureRectangle(bitmap, MID_X, MID_W, MID_Y, MID_H);
@@ -600,15 +319,15 @@ public class AutoOpMode extends LinearOpMode {
         telemetry.addData("mid:", String.format("%06X", midyellow));
         telemetry.addData("right:", String.format("%06X", rightyellow));
 
-        if( leftyellow>midyellow && leftyellow>rightyellow) {
-            cube_level=1;
-        }
-        if( midyellow>leftyellow && midyellow>rightyellow) {
-            cube_level=2;
-        }
-        if( rightyellow>midyellow && rightyellow>leftyellow) {
-            cube_level=3;
-        }
+//        if( leftyellow>midyellow && leftyellow>rightyellow) {
+//            cube_level=1;
+//        }
+//        if( midyellow>leftyellow && midyellow>rightyellow) {
+//            cube_level=2;
+//        }
+//        if( rightyellow>midyellow && rightyellow>leftyellow) {
+//            cube_level=3;
+//        }
 
         if (cameraStreamRequestContinuation != null) {
             DrawRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
@@ -631,10 +350,7 @@ public class AutoOpMode extends LinearOpMode {
         int green = (color & 0x0000FF00) >> 8;
         int blue = (color & 0x000000FF);
         return red+green-blue;
-
-
     }
-
 
     private void DrawRectangle(Bitmap bitmap, int x, int w, int y, int h) {
         DrawHLine(bitmap, x, y - 1, w);

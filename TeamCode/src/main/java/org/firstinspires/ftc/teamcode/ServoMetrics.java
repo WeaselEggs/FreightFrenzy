@@ -5,13 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp
-@Disabled
 public class ServoMetrics extends LinearOpMode {
     private static final int MIN_HEIGHT_TICKS = 900;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Servo intake_pivot = hardwareMap.get(Servo.class, "intake_pivot");
+        Servo intake_pivot = hardwareMap.get(Servo.class, "scissor");
 
         waitForStart();
 

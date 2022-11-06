@@ -17,10 +17,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 public class SystemTest extends LinearOpMode {
-    private static final double BALL_INTAKE_POSITION = 0.50;
-    private static final double CUBE_INTAKE_POSITION = 0.625;
-    private static final double DROPOFF_POSITION = 0.43;
-    private static final double OBSTACLE_POSITION = 0.27;
+    //private static final double BALL_INTAKE_POSITION = 0.50;
+    //private static final double CUBE_INTAKE_POSITION = 0.625;
+    //private static final double DROPOFF_POSITION = 0.43;
+    //private static final double OBSTACLE_POSITION = 0.27;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -33,11 +33,13 @@ public class SystemTest extends LinearOpMode {
 
         DcMotor slide = hardwareMap.get(DcMotor.class, "slide");
 
-        CRServo carousel_spin_blue = hardwareMap.get(CRServo.class, "carousel_spin_blue");
+        //CRServo carousel_spin_blue = hardwareMap.get(CRServo.class, "carousel_spin_blue");
 
-        CRServo carousel_spin_red = hardwareMap.get(CRServo.class, "carousel_spin_red");
-        Servo capper = hardwareMap.get(Servo.class, "capper");
+       // CRServo carousel_spin_red = hardwareMap.get(CRServo.class, "carousel_spin_red");
+        Servo capper = hardwareMap.get(Servo.class, "scissor");
         float capper_position= 0;
+        Servo flipper = hardwareMap.get(Servo.class,"tilt" );
+        float flipper_position = 0;
 
 
         //CRServo intake_spin = hardwareMap.get(CRServo.class, "intake_spin");
@@ -48,8 +50,10 @@ public class SystemTest extends LinearOpMode {
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        boolean old_left_bumper=false;
-        boolean old_right_bumper=false;
+        boolean old_left_bumper1=false;
+        boolean old_right_bumper1=false;
+        boolean old_left_bumper2=false;
+        boolean old_right_bumper2=false;
         while (!isStopRequested()){
 /*
             double rotated_x = -gamepad1.left_stick_y;
@@ -75,15 +79,15 @@ public class SystemTest extends LinearOpMode {
                 scale /= 3;
             }*/
 
-            double carousel_power;
-            if(gamepad2.right_bumper){
-                carousel_power = 0.6;
-            } else {
-                carousel_power = 0;
-            }
+            //double carousel_power;
+         //   if(gamepad2.right_bumper){
+             //   carousel_power = 0.6;
+           // } else {
+          //      carousel_power = 0;
+//            }
 
-            carousel_spin_blue.setPower(carousel_power);
-            carousel_spin_red.setPower(carousel_power);
+           // carousel_spin_blue.setPower(carousel_power);
+          //  carousel_spin_red.setPower(carousel_power);
 
             front_left.setPower(gamepad1.left_stick_x);
             front_right.setPower(gamepad1.right_stick_x);
@@ -108,29 +112,37 @@ public class SystemTest extends LinearOpMode {
                 slide.setTargetPosition(1380);
                 slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
-
             if (gamepad2.x) {
                 slide.setTargetPosition(870);
             }
-
             if (gamepad1.b) {
                 slide.setTargetPosition(350);
-
             }
-            if(gamepad1.left_bumper && !old_left_bumper){
+
+            if(gamepad1.left_bumper && !old_left_bumper1){
                 capper_position += .05;
             }
-            if(gamepad1.right_bumper&& !old_right_bumper){
+            if(gamepad1.right_bumper&& !old_right_bumper1){
                 capper_position -= .05;
             }
-            old_left_bumper= gamepad1.left_bumper;
-            old_right_bumper=gamepad1.right_bumper;
+            old_left_bumper1= gamepad1.left_bumper;
+            old_right_bumper1=gamepad1.right_bumper;
             capper.setPosition(capper_position);
+
+            if(gamepad2.left_bumper && !old_left_bumper2){
+                flipper_position += .05;
+            }
+            if(gamepad2.right_bumper&& !old_right_bumper2){
+                flipper_position -= .05;
+            }
+            old_left_bumper2= gamepad2.left_bumper;
+            old_right_bumper2=gamepad2.right_bumper;
+            flipper.setPosition(flipper_position);
 
             telemetry.addData("Slide Encoder:", String.format("%d", slide_ticks));
 
-            telemetry.addData("finger position", String.format("%.2f", capper_position));
-
+            telemetry.addData("capper position", String.format("%.2f", capper_position));
+            telemetry.addData("flipper position", String.format("%.2f", flipper_position));
 
            /*
            if (gamepad2.dpad_down){
