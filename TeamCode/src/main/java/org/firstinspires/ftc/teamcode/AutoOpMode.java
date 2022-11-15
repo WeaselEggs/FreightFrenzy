@@ -52,7 +52,13 @@ public class AutoOpMode extends LinearOpMode {
     private DcMotor front_right;
     private DcMotor back_left;
     private DcMotor back_right;
-//    private boolean is_blue = false;
+
+    private static final double TILT_STORED_POSITION = .35;
+    private static final double TILT_DOWN_POSITION = .6;
+    private static final double SCISSOR_STORED_POSITION = .35;
+    private static final double SCISSOR_OPEN_POSITION = .95;
+
+    //    private boolean is_blue = false;
 //    private boolean is_red = true;
     private boolean wait_choice = false;
     private boolean strafe_left = false;
@@ -166,7 +172,10 @@ public class AutoOpMode extends LinearOpMode {
         } finally {
 //            closeCamera();
         }
-
+        Servo tilt = hardwareMap.get(Servo.class, "tilt");
+        tilt.setPosition(TILT_STORED_POSITION);
+        Servo scissor = hardwareMap.get(Servo.class, "scissor");
+        scissor.setPosition(SCISSOR_OPEN_POSITION);
 
 //        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -181,10 +190,10 @@ public class AutoOpMode extends LinearOpMode {
             //Waits for 10 seconds
             waitfor(10000);
         }
-        if(strafe_left==true){
+        if(strafe_left==false){
             drive(0,.6,0,1150);
         }
-        else if (strafe_left==false){
+        else if (strafe_left==true){
             drive(0,-.6,0,1000);
         }
 
@@ -198,7 +207,7 @@ public class AutoOpMode extends LinearOpMode {
 //            telemetry.addData("Alliance Color Red(dpad left)", is_red ? "yes" : "no");
 //            telemetry.addData("Alliance Color Blue(dpad right)", is_blue ? "yes" : "no");
             telemetry.addData("Wait(a/b)", wait_choice ? "yes" : "no");
-            telemetry.addData("Stafe left/right(x/y)", strafe_left ? "left" : "yes");
+            telemetry.addData("Strafe Direction(x Left /y Right)", strafe_left ? "left" : "right");
 //            telemetry.addData("Skip duck(dpad up/dpad down)", skip_duck ? "yes" : "no");
 //            telemetry.addData("Just duck(right bumper/left bumper)", just_duck ? "yes" : "no");
 //            telemetry.addData("visionary auto (left trigger/right trigger)", visionary_auto ? "yes" : "no");

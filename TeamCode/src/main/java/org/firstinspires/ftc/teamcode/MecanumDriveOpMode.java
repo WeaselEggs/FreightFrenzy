@@ -18,10 +18,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp
 public class MecanumDriveOpMode extends LinearOpMode {
 
-    private static final double TILT_STORED_POSITION = .4;
+    private static final double TILT_STORED_POSITION = .35;
+    private static final double TILT_DOWN_POSITION = .6;
     private static final double SCISSOR_STORED_POSITION = .35;
     private static final double SCISSOR_OPEN_POSITION = .95;
-    private static final double TILT_DOWN_POSITION = .6;
+
 
     //NONE OF THESE POSITIONS ARE RIGHT
 //    private static final double CAPPER_TRAVEL_POSITION = .65;
@@ -58,9 +59,9 @@ public class MecanumDriveOpMode extends LinearOpMode {
 //        capper.setPosition(CAPPER_STORED_POSITION);
 
         Servo tilt = hardwareMap.get(Servo.class, "tilt");
-//        tilt.setPosition(TILT_STORED_POSITION);
+        tilt.setPosition(TILT_STORED_POSITION);
         Servo scissor = hardwareMap.get(Servo.class, "scissor");
-//        scissor.setPosition(SCISSOR_STORED_POSITION);
+        scissor.setPosition(SCISSOR_OPEN_POSITION);
 
         waitForStart();
 
@@ -91,7 +92,7 @@ public class MecanumDriveOpMode extends LinearOpMode {
             } else {
                 scale = 1;
             }
-            if (gamepad1.left_bumper) {
+            if (gamepad1.right_bumper) {
                 scale /= 3;
             }
             front_left.setPower(scale * front_left_power);
@@ -147,22 +148,42 @@ public class MecanumDriveOpMode extends LinearOpMode {
                 slide.setPower(0.45);
                 slide_stable = true;
             }
-             if (gamepad1.y){
+             if (gamepad1.x){
                  //tilt up
                  tilt.setPosition(TILT_DOWN_POSITION);
              }
-             if (gamepad1.x){
+             if (gamepad1.y){
                  //tilt flat
                  tilt.setPosition(TILT_STORED_POSITION);
+
              }
              if(gamepad1.a){
-                 //scissor closed
-                 scissor.setPosition(SCISSOR_STORED_POSITION);
-             }
-             if(gamepad1.b){
                  //scissor open
                  scissor.setPosition(SCISSOR_OPEN_POSITION);
              }
+             if(gamepad1.b){
+                 //scissor close
+                 scissor.setPosition(SCISSOR_STORED_POSITION);
+             }
+            if (gamepad2.x){
+                //tilt up
+                tilt.setPosition(TILT_DOWN_POSITION);
+            }
+            if (gamepad2.y) {
+                //tilt flat
+                tilt.setPosition(TILT_STORED_POSITION);
+
+            }
+            if(gamepad2.a){
+                //scissor open
+                scissor.setPosition(SCISSOR_OPEN_POSITION);
+            }
+            if(gamepad2.b){
+                //scissor close
+                scissor.setPosition(SCISSOR_STORED_POSITION);
+            }
+
+
 
 //            else if (gamepad1.x) { // move slide to capping hover position
 //                slide.setTargetPosition(SLIDE_CAPPER_HOVER_TICKS);
