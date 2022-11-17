@@ -77,18 +77,10 @@ public class AutoOpMode extends LinearOpMode {
 //    private static final int SLIDE_LEVEL2_TICKS = 803;
 //    private static final int SLIDE_LEVEL3_TICKS = 1358;
 
-    private static final int LEFT_X = 23;
-    private static final int LEFT_W = 91;
-    private static final int LEFT_Y = 296;
-    private static final int LEFT_H = 146;
-    private static final int RIGHT_X = 526;
-    private static final int RIGHT_W = 113;
-    private static final int RIGHT_Y = 296;
-    private static final int RIGHT_H = 149;
-    private static final int MID_X = 298;
-    private static final int MID_W = 108;
-    private static final int MID_Y = 296;
-    private static final int MID_H = 138;
+    private static final int SIGNAL_X = 126;
+    private static final int SIGNAL_W = 61;
+    private static final int SIGNAL_Y = 313;
+    private static final int SIGNAL_H = 116;
     //----------------------------------------------------------------------------------------------
     // State
     //----------------------------------------------------------------------------------------------
@@ -118,7 +110,7 @@ public class AutoOpMode extends LinearOpMode {
 
     private boolean captureWhenAvailable = true;
     private Continuation<? extends Consumer<Bitmap>> cameraStreamRequestContinuation;
-//    private int cube_level;
+    private int parking_zone;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -145,32 +137,32 @@ public class AutoOpMode extends LinearOpMode {
 //        Servo capper = hardwareMap.get(Servo.class, "capper");
 //        capper.setPosition(CAPPER_STORED_POSITION);
 
-//        callbackHandler = CallbackLooper.getDefault().getHandler();
+        callbackHandler = CallbackLooper.getDefault().getHandler();
 
-//        cameraManager = ClassFactory.getInstance().getCameraManager();
-//        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        cameraManager = ClassFactory.getInstance().getCameraManager();
+        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
-//        initializeFrameQueue(2);
-//        AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
+        initializeFrameQueue(2);
+        AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
 
-//        CameraStreamServer.getInstance().setSource(new CameraStreamSource() {
-//            @Override
-//            public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
-//                cameraStreamRequestContinuation = continuation;
-//                captureWhenAvailable = true;
-//            }
-//        });
+        CameraStreamServer.getInstance().setSource(new CameraStreamSource() {
+            @Override
+            public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+                cameraStreamRequestContinuation = continuation;
+                captureWhenAvailable = true;
+            }
+        });
 
         try {
-//            openCamera();
-//            if (camera == null) return;
-//
-//            startCamera();
-//            if (cameraCaptureSession == null) return;
+            openCamera();
+            if (camera == null) return;
+
+            startCamera();
+            if (cameraCaptureSession == null) return;
 
             choosewell();
         } finally {
-//            closeCamera();
+            closeCamera();
         }
         Servo tilt = hardwareMap.get(Servo.class, "tilt");
         tilt.setPosition(TILT_STORED_POSITION);
@@ -213,17 +205,17 @@ public class AutoOpMode extends LinearOpMode {
 //            telemetry.addData("visionary auto (left trigger/right trigger)", visionary_auto ? "yes" : "no");
 //            telemetry.addData("visionary auto side(start/back)", vision_spinner ? "spinner": "barrier");
 
-//            telemetry.addData("", ""); // blank line to separate configuration from actual telemetry
+            telemetry.addData("", ""); // blank line to separate configuration from actual telemetry
 
-//            telemetry.addData("cube level", String.format("%d", cube_level));
+            telemetry.addData("parking zone, 1=left 2=mid, 3=right", String.format("%d", parking_zone));
 
-//            if (captureWhenAvailable) {
-//                Bitmap bmp = frameQueue.poll();
-//                if (bmp != null) {
-//                    //captureWhenAvailable = false;
-//                    onNewFrame(bmp);
-//                }
-//            }
+            if (captureWhenAvailable) {
+                Bitmap bmp = frameQueue.poll();
+                if (bmp != null) {
+                    //captureWhenAvailable = false;
+                    onNewFrame(bmp);
+                }
+            }
             idle();
 //            if (gamepad1.dpad_left) {
 //                is_blue = false;
@@ -315,33 +307,29 @@ public class AutoOpMode extends LinearOpMode {
 
     /** Do something with the frame */
     private void onNewFrame(Bitmap bitmap) {
-        int leftAverageColor = MeasureRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
-        telemetry.addData("Left average:", String.format("%06X", leftAverageColor));
-        int midAverageColor = MeasureRectangle(bitmap, MID_X, MID_W, MID_Y, MID_H);
-        telemetry.addData("MID AVERAGE:", String.format("%06X", midAverageColor));
-        int rightAverageColor = MeasureRectangle(bitmap, RIGHT_X, RIGHT_W, RIGHT_Y, RIGHT_H);
-        telemetry.addData("RIGHT AVERAGE:", String.format("%06X", rightAverageColor));
-        int leftyellow= ComputeYellowness(leftAverageColor);
-        int midyellow= ComputeYellowness(midAverageColor);
-        int rightyellow= ComputeYellowness(rightAverageColor);
-        telemetry.addData("left:", String.format("%06X", leftyellow));
-        telemetry.addData("mid:", String.format("%06X", midyellow));
-        telemetry.addData("right:", String.format("%06X", rightyellow));
+        int signalAverageColor = MeasureRectangle(bitmap, SIGNAL_X, SIGNAL_W, SIGNAL_Y, SIGNAL_H);
+        telemetry.addData("signal Average:", String.format("%06X",signalAverageColor));
 
-//        if( leftyellow>midyellow && leftyellow>rightyellow) {
-//            cube_level=1;
-//        }
-//        if( midyellow>leftyellow && midyellow>rightyellow) {
-//            cube_level=2;
-//        }
-//        if( rightyellow>midyellow && rightyellow>leftyellow) {
-//            cube_level=3;
-//        }
+        int signalyellow= ComputeYellowness(signalAverageColor);
+        int signalblue= ComputeBlueness(signalAverageColor);
+        int signalpink= ComputePinkness(signalAverageColor);
+        telemetry.addData("yellow quantity:", String.format("%06X", signalyellow));
+        telemetry.addData("pink quantity:", String.format("%06X", signalpink));
+        telemetry.addData("blue quantity:", String.format("%06X", signalblue));
+        telemetry.update();
+
+        if( signalyellow>signalblue&& signalyellow>signalpink){
+            parking_zone=3;
+        }
+        if( signalblue>signalyellow&& signalblue>signalpink){
+            parking_zone=1;
+        }
+        if( signalpink>signalblue&& signalpink>signalyellow){
+            parking_zone=2;
+        }
 
         if (cameraStreamRequestContinuation != null) {
-            DrawRectangle(bitmap, LEFT_X, LEFT_W, LEFT_Y, LEFT_H);
-            DrawRectangle(bitmap, RIGHT_X, RIGHT_W, RIGHT_Y, RIGHT_H);
-            DrawRectangle(bitmap, MID_X, MID_W, MID_Y, MID_H);
+            DrawRectangle(bitmap, SIGNAL_X, SIGNAL_W, SIGNAL_Y, SIGNAL_H);
             cameraStreamRequestContinuation.dispatch(new ContinuationResult<Consumer<Bitmap>>() {
                 @Override
                 public void handle(Consumer<Bitmap> consumer) {
@@ -359,6 +347,18 @@ public class AutoOpMode extends LinearOpMode {
         int green = (color & 0x0000FF00) >> 8;
         int blue = (color & 0x000000FF);
         return red+green-blue;
+    }
+    private int ComputeBlueness (int color){
+        int red = (color & 0x00FF0000) >> 16;
+        int green = (color & 0x0000FF00) >> 8;
+        int blue = (color & 0x000000FF);
+        return blue+green-red;
+    }
+    private int ComputePinkness (int color){
+        int red = (color & 0x00FF0000) >> 16;
+        int green = (color & 0x0000FF00) >> 8;
+        int blue = (color & 0x000000FF);
+        return red+blue-green;
     }
 
     private void DrawRectangle(Bitmap bitmap, int x, int w, int y, int h) {
